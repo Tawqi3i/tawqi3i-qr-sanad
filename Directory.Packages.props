@@ -1,0 +1,46 @@
+<Project>
+
+  <!-- Central package versions: every project references packages without a Version attribute. -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <!-- Lets the pins below override vulnerable versions that drivers pull in transitively. -->
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+    <EfCoreVersion>10.0.13</EfCoreVersion>
+    <AspNetCoreVersion>10.0.13</AspNetCoreVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- EF Core and database providers -->
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(EfCoreVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfCoreVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(EfCoreVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(EfCoreVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EfCoreVersion)" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <PackageVersion Include="Oracle.EntityFrameworkCore" Version="10.23.26400" />
+    <PackageVersion Include="MySql.EntityFrameworkCore" Version="10.0.12" />
+    <PackageVersion Include="EFCore.NamingConventions" Version="10.0.1" />
+
+    <!-- Configuration and caching -->
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="$(AspNetCoreVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="$(AspNetCoreVersion)" />
+
+    <!-- Identity -->
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="$(AspNetCoreVersion)" />
+
+    <!-- Transitive security pins: Microsoft.Data.SqlClient and Oracle.ManagedDataAccess.Core
+         reference 9.0.11, which has GHSA-2fmv-rv2c-59x7 and GHSA-846f-f764-76mx. -->
+    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
+
+    <!-- Web host -->
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="$(AspNetCoreVersion)" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.3.1" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
+
+    <!-- Tests -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageVersion Include="NUnit" Version="4.6.1" />
+    <PackageVersion Include="NUnit3TestAdapter" Version="6.3.1" />
+  </ItemGroup>
+
+</Project>

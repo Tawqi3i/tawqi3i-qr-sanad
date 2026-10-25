@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- General -->
+  <data name="Success" xml:space="preserve"><value>تمت العملية بنجاح</value></data>
+  <data name="Created successfully" xml:space="preserve"><value>تم الإنشاء بنجاح</value></data>
+  <data name="Updated successfully" xml:space="preserve"><value>تم التحديث بنجاح</value></data>
+  <data name="The maximum length must not be less than the minimum length" xml:space="preserve"><value>يجب ألا يكون الحد الأقصى للطول أقل من الحد الأدنى</value></data>
+  <data name="Password policy updated. Every user must change their password" xml:space="preserve"><value>تم تعديل سياسة كلمة المرور. يجب على جميع المستخدمين تغيير كلمات المرور</value></data>
+  <data name="Deleted successfully" xml:space="preserve"><value>تم الحذف بنجاح</value></data>
+  <data name="Sorry, something went wrong" xml:space="preserve"><value>عذراً، حدث خطأ ما</value></data>
+  <data name="The start date must be before the end date, at most 92 days apart" xml:space="preserve"><value>يجب أن يكون تاريخ البداية قبل تاريخ النهاية، وألا تزيد المدة بينهما عن 92 يوماً</value></data>
+  <data name="The QR code is invalid" xml:space="preserve"><value>رمز QR غير صالح</value></data>
+  <data name="No valid license is installed" xml:space="preserve"><value>لا يوجد ترخيص صالح مثبّت</value></data>
+  <data name="The license key is invalid" xml:space="preserve"><value>مفتاح الترخيص غير صالح</value></data>
+  <data name="The license has expired. Contact your provider to renew it" xml:space="preserve"><value>انتهت صلاحية الترخيص. تواصل مع المزوّد لتجديده</value></data>
+  <data name="The license user limit has been reached" xml:space="preserve"><value>تم الوصول إلى الحد الأقصى للمستخدمين في الترخيص</value></data>
+  <data name="The license branch limit has been reached" xml:space="preserve"><value>تم الوصول إلى الحد الأقصى للفروع في الترخيص</value></data>
+  <data name="License updated successfully" xml:space="preserve"><value>تم تحديث الترخيص بنجاح</value></data>
+  <data name="The e-seal service is unavailable. Try again later" xml:space="preserve"><value>خدمة الختم الإلكتروني غير متاحة حالياً. حاول مرة أخرى لاحقاً</value></data>
+  <data name="Unauthorized" xml:space="preserve"><value>غير مصرح</value></data>
+  <data name="Access is forbidden" xml:space="preserve"><value>الوصول ممنوع</value></data>
+  <data name="Too many requests. Try again later" xml:space="preserve"><value>طلبات كثيرة جداً. حاول مرة أخرى لاحقاً</value></data>
+  <data name="One or more fields are invalid" xml:space="preserve"><value>حقل واحد أو أكثر غير صالح</value></data>
+  <data name="The record was changed by another request. Reload it and try again" xml:space="preserve"><value>تم تعديل السجل بواسطة طلب آخر. أعد تحميله وحاول مرة أخرى</value></data>
+  <data name="A record with the same value already exists" xml:space="preserve"><value>يوجد سجل بنفس القيمة مسبقاً</value></data>
+
+  <!-- Authentication -->
+  <data name="Invalid username or password" xml:space="preserve"><value>اسم المستخدم أو كلمة المرور غير صحيحة</value></data>
+  <data name="Account is temporarily locked. Try again later" xml:space="preserve"><value>الحساب مقفل مؤقتاً. حاول مرة أخرى لاحقاً</value></data>
+  <data name="Account is disabled" xml:space="preserve"><value>الحساب معطّل</value></data>
+  <data name="Invalid or expired refresh token" xml:space="preserve"><value>رمز التحديث غير صالح أو منتهي الصلاحية</value></data>
+  <data name="Logged out successfully" xml:space="preserve"><value>تم تسجيل الخروج بنجاح</value></data>
+  <data name="Password changed successfully" xml:space="preserve"><value>تم تغيير كلمة المرور بنجاح</value></data>
+  <data name="Password reset successfully" xml:space="preserve"><value>تمت إعادة تعيين كلمة المرور بنجاح</value></data>
+  <data name="Current password is incorrect" xml:space="preserve"><value>كلمة المرور الحالية غير صحيحة</value></data>
+  <data name="New password must be different from the current password" xml:space="preserve"><value>يجب أن تختلف كلمة المرور الجديدة عن الحالية</value></data>
+  <data name="Password does not meet the password policy" xml:space="preserve"><value>كلمة المرور لا تستوفي سياسة كلمات المرور</value></data>
+  <data name="You must change your password before continuing" xml:space="preserve"><value>يجب تغيير كلمة المرور قبل المتابعة</value></data>
+
+  <!-- Users -->
+  <data name="User not found" xml:space="preserve"><value>المستخدم غير موجود</value></data>
+  <data name="Username is already in use" xml:space="preserve"><value>اسم المستخدم مستخدم مسبقاً</value></data>
+  <data name="Email is already in use" xml:space="preserve"><value>البريد الإلكتروني مستخدم مسبقاً</value></data>
+  <data name="You cannot perform this action on your own account" xml:space="preserve"><value>لا يمكنك تنفيذ هذا الإجراء على حسابك</value></data>
+  <data name="You cannot manage this user" xml:space="preserve"><value>لا يمكنك إدارة هذا المستخدم</value></data>
+  <data name="You cannot create this type of user" xml:space="preserve"><value>لا يمكنك إنشاء هذا النوع من المستخدمين</value></data>
+  <data name="User unlocked successfully" xml:space="preserve"><value>تم فتح قفل المستخدم بنجاح</value></data>
+
+  <!-- Branches -->
+  <data name="Branch not found" xml:space="preserve"><value>الفرع غير موجود</value></data>
+  <data name="Branch name is already in use" xml:space="preserve"><value>اسم الفرع مستخدم مسبقاً</value></data>
+  <data name="Branch code is already in use" xml:space="preserve"><value>رمز الفرع مستخدم مسبقاً</value></data>
+  <data name="A branch is required for this type of user" xml:space="preserve"><value>يجب تحديد فرع لهذا النوع من المستخدمين</value></data>
+  <data name="The branch is disabled" xml:space="preserve"><value>الفرع معطّل</value></data>
+  <data name="The branch already has an admin" xml:space="preserve"><value>يوجد أدمن لهذا الفرع مسبقاً</value></data>
+
+  <!-- Permissions -->
+  <data name="One or more permissions do not exist" xml:space="preserve"><value>صلاحية واحدة أو أكثر غير موجودة</value></data>
+  <data name="You cannot grant or revoke permissions you do not have" xml:space="preserve"><value>لا يمكنك منح أو سحب صلاحيات لا تملكها</value></data>
+
+  <!-- Validation -->
+  <data name="The {0} field is required" xml:space="preserve"><value>الحقل {0} مطلوب</value></data>
+  <data name="The {0} field must not exceed {1} characters" xml:space="preserve"><value>يجب ألا يتجاوز الحقل {0} {1} حرفاً</value></data>
+  <data name="The {0} field must be {2} to {1} characters long" xml:space="preserve"><value>يجب أن يكون طول الحقل {0} بين {2} و {1} حرفاً</value></data>
+  <data name="The {0} field must be between {1} and {2}" xml:space="preserve"><value>يجب أن تكون قيمة الحقل {0} بين {1} و {2}</value></data>
+  <data name="The {0} field is not a valid email address" xml:space="preserve"><value>الحقل {0} ليس بريداً إلكترونياً صالحاً</value></data>
+  <data name="The {0} field is not a valid phone number" xml:space="preserve"><value>الحقل {0} ليس رقم هاتف صالحاً</value></data>
+  <data name="The {0} field is invalid" xml:space="preserve"><value>الحقل {0} غير صالح</value></data>
+  <data name="The {0} field must not contain more than {1} items" xml:space="preserve"><value>يجب ألا يحتوي الحقل {0} على أكثر من {1} عنصر</value></data>
+  <data name="Passwords do not match" xml:space="preserve"><value>كلمتا المرور غير متطابقتين</value></data>
+  <data name="Username must be 3 to 64 characters: letters, digits, dot, underscore or dash" xml:space="preserve"><value>يجب أن يتكون اسم المستخدم من 3 إلى 64 حرفاً: أحرف إنجليزية أو أرقام أو نقطة أو شرطة سفلية أو شرطة</value></data>
+</root>

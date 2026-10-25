@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <!-- Provider-neutral EF Core: repository contracts expose IQueryable and UpdateSettersBuilder. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Tawqi3i.QrSanad.DomainTests" />
+  </ItemGroup>
+
+</Project>

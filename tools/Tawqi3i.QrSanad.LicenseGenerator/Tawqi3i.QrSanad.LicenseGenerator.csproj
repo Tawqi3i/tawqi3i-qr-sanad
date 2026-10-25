@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Issues license keys. Run by whoever holds the private key; never deployed with the API. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Infrastructure\Tawqi3i.QrSanad.Licensing\Tawqi3i.QrSanad.Licensing.csproj" />
+  </ItemGroup>
+
+</Project>

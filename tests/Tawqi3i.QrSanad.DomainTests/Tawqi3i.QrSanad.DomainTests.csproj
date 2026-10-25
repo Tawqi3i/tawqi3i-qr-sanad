@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="NUnit" />
+    <PackageReference Include="NUnit3TestAdapter" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Core\Tawqi3i.QrSanad.Domain\Tawqi3i.QrSanad.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Infrastructure\Tawqi3i.QrSanad.Licensing\Tawqi3i.QrSanad.Licensing.csproj" />
+    <ProjectReference Include="..\..\src\Infrastructure\Tawqi3i.QrSanad.Sanad\Tawqi3i.QrSanad.Sanad.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="NUnit.Framework" />
+  </ItemGroup>
+
+</Project>
