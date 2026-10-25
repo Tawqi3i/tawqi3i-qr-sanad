@@ -483,3 +483,6 @@ $RECYCLE.BIN/
 
 # Local secrets (copy appsettings.Development.example.json -> appsettings.Development.json)
 **/appsettings.Development.json
+
+# Generated SQL scripts (kept locally, not in git)
+/Database/
