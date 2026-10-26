@@ -618,6 +618,85 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.Oracle
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Tawqi3i.QrSanad.Common.Domain.Models.V1.SecurityAuditLog", b =>
+                {
+                    b.OwnsOne("Tawqi3i.QrSanad.Common.Domain.Models.V1.IdentityCard", "IdentityCard", b1 =>
+                        {
+                            b1.Property<Guid>("SecurityAuditLogId")
+                                .HasColumnType("RAW(16)")
+                                .HasColumnName("ID");
+
+                            b1.Property<string>("ArabicName")
+                                .IsRequired()
+                                .HasMaxLength(256)
+                                .HasColumnType("NVARCHAR2(256)")
+                                .HasColumnName("IDENTITY_CARD_ARABIC_NAME");
+
+                            b1.Property<string>("BirthDate")
+                                .HasColumnType("NVARCHAR2(10)")
+                                .HasColumnName("IDENTITY_CARD_BIRTH_DATE");
+
+                            b1.Property<string>("BloodType")
+                                .HasMaxLength(8)
+                                .HasColumnType("NVARCHAR2(8)")
+                                .HasColumnName("IDENTITY_CARD_BLOOD_TYPE");
+
+                            b1.Property<string>("CardNumber")
+                                .HasMaxLength(32)
+                                .HasColumnType("NVARCHAR2(32)")
+                                .HasColumnName("IDENTITY_CARD_CARD_NUMBER");
+
+                            b1.Property<string>("EnglishName")
+                                .IsRequired()
+                                .HasMaxLength(256)
+                                .HasColumnType("NVARCHAR2(256)")
+                                .HasColumnName("IDENTITY_CARD_ENGLISH_NAME");
+
+                            b1.Property<string>("ExpiryDate")
+                                .HasColumnType("NVARCHAR2(10)")
+                                .HasColumnName("IDENTITY_CARD_EXPIRY_DATE");
+
+                            b1.Property<string>("Gender")
+                                .HasMaxLength(32)
+                                .HasColumnType("NVARCHAR2(32)")
+                                .HasColumnName("IDENTITY_CARD_GENDER");
+
+                            b1.Property<string>("MotherName")
+                                .HasMaxLength(256)
+                                .HasColumnType("NVARCHAR2(256)")
+                                .HasColumnName("IDENTITY_CARD_MOTHER_NAME");
+
+                            b1.Property<string>("NationalNumber")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("NVARCHAR2(10)")
+                                .HasColumnName("IDENTITY_CARD_NATIONAL_NUMBER");
+
+                            b1.Property<string>("RegistryNumber")
+                                .HasMaxLength(32)
+                                .HasColumnType("NVARCHAR2(32)")
+                                .HasColumnName("IDENTITY_CARD_REGISTRY_NUMBER");
+
+                            b1.Property<string>("Residence")
+                                .HasMaxLength(256)
+                                .HasColumnType("NVARCHAR2(256)")
+                                .HasColumnName("IDENTITY_CARD_RESIDENCE");
+
+                            b1.HasKey("SecurityAuditLogId");
+
+                            b1.HasIndex("NationalNumber")
+                                .HasDatabaseName("IX_SECURITY_AUDIT_LOGS_IDENTITY_CARD_NATIONAL_NUMBER");
+
+                            b1.ToTable("SECURITY_AUDIT_LOGS");
+
+                            b1.WithOwner()
+                                .HasForeignKey("SecurityAuditLogId")
+                                .HasConstraintName("FK_SECURITY_AUDIT_LOGS_SECURITY_AUDIT_LOGS_ID");
+                        });
+
+                    b.Navigation("IdentityCard");
+                });
+
             modelBuilder.Entity("Tawqi3i.QrSanad.Common.Domain.Models.V1.User", b =>
                 {
                     b.HasOne("Tawqi3i.QrSanad.Common.Domain.Models.V1.Branch", "Branch")

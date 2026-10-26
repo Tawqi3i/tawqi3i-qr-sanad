@@ -88,7 +88,26 @@ internal static class ViewModelFactory
             IpAddress = log.IpAddress,
             UserAgent = log.UserAgent,
             Details = log.Details,
+            IdentityCard = log.IdentityCard is { } card ? Create(card) : null,
             CreatedAt = log.CreatedAt
+        };
+    }
+
+    public static IdentityCardViewModel Create(IdentityCard card)
+    {
+        return new IdentityCardViewModel
+        {
+            NationalNumber = card.NationalNumber,
+            ArabicName = card.ArabicName,
+            EnglishName = card.EnglishName,
+            Gender = card.Gender,
+            BloodType = card.BloodType,
+            BirthDate = card.BirthDate,
+            MotherName = card.MotherName,
+            RegistryNumber = card.RegistryNumber,
+            ExpiryDate = card.ExpiryDate,
+            Residence = card.Residence,
+            CardNumber = card.CardNumber
         };
     }
 

@@ -22,5 +22,10 @@ public class SecurityAuditLogViewModel
 
     public string? Details { get; set; }
 
+    /// <summary>
+    /// The identity card a successful QR scan returned. Null for other events and documents.
+    /// </summary>
+    public IdentityCardViewModel? IdentityCard { get; set; }
+
     public DateTime CreatedAt { get; set; }
 }

@@ -110,6 +110,29 @@ public class AccessGuardTests
     }
 
     [Test]
+    public void ScansVisibleTo_FollowsTheAuditLogPermission()
+    {
+        var scanner = Guid.NewGuid();
+        var logs = new[]
+        {
+            Log(SecurityEventType.QrScanSucceeded, BranchA, scanner),
+            Log(SecurityEventType.QrScanFailed, BranchA, Guid.NewGuid()),
+            Log(SecurityEventType.QrScanSucceeded, BranchB, Guid.NewGuid()),
+            Log(SecurityEventType.LoginSucceeded, BranchA, scanner),
+        }.AsQueryable();
+
+        var seenBySuperAdmin = AccessGuard.ScansVisibleTo(logs, Access(UserType.SuperAdmin, null)).ToList();
+        var seenByAuditor = AccessGuard.ScansVisibleTo(logs, Access(UserType.Admin, BranchA, PermissionCodes.AuditLogs.View)).ToList();
+        var seenByScanner = AccessGuard.ScansVisibleTo(logs, Access(UserType.User, BranchA, PermissionCodes.ESeal.View, scanner)).ToList();
+
+        Assert.That(seenBySuperAdmin, Has.Count.EqualTo(3));
+        Assert.That(seenByAuditor, Has.Count.EqualTo(2));
+        Assert.That(seenByAuditor.All(a => a.BranchId == BranchA), Is.True);
+        Assert.That(seenByScanner, Has.Count.EqualTo(1));
+        Assert.That(seenByScanner[0].UserId, Is.EqualTo(scanner));
+    }
+
+    [Test]
     public void HasPermission_SuperAdminHoldsAllAndUserOnlyWhatWasGranted()
     {
         var superAdmin = Access(UserType.SuperAdmin, null);
@@ -121,6 +144,11 @@ public class AccessGuardTests
     private static User User(UserType type, Guid? branchId)
     {
         return new User { Id = Guid.NewGuid(), UserType = type, BranchId = branchId };
+    }
+
+    private static SecurityAuditLog Log(SecurityEventType eventType, Guid branchId, Guid userId)
+    {
+        return new SecurityAuditLog { Id = Guid.NewGuid(), EventType = eventType, BranchId = branchId, UserId = userId };
     }
 
     private static UserAccess Access(UserType type, Guid? branchId, params string[] permissions)

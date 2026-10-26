@@ -20,6 +20,22 @@ internal sealed class SecurityAuditLogConfiguration : IEntityTypeConfiguration<S
         // provider (Oracle NVARCHAR2 tops out at 2000) rather than a LOB.
         builder.Property(a => a.Details).HasMaxLength(2000);
 
+        // Columns of the same row. The national number is required, so a row without one has no card.
+        builder.OwnsOne(a => a.IdentityCard, card =>
+        {
+            card.Property(a => a.NationalNumber).HasMaxLength(10).IsRequired();
+            card.Property(a => a.ArabicName).HasMaxLength(256).IsRequired();
+            card.Property(a => a.EnglishName).HasMaxLength(256).IsRequired();
+            card.Property(a => a.Gender).HasMaxLength(32);
+            card.Property(a => a.BloodType).HasMaxLength(8);
+            card.Property(a => a.MotherName).HasMaxLength(256);
+            card.Property(a => a.RegistryNumber).HasMaxLength(32);
+            card.Property(a => a.Residence).HasMaxLength(256);
+            card.Property(a => a.CardNumber).HasMaxLength(32);
+
+            card.HasIndex(a => a.NationalNumber);
+        });
+
         builder.HasIndex(a => a.CreatedAt);
         builder.HasIndex(a => new { a.UserId, a.CreatedAt });
         builder.HasIndex(a => new { a.BranchId, a.CreatedAt });

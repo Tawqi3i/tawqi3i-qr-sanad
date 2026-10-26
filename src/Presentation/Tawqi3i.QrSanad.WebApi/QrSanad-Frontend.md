@@ -37,7 +37,7 @@ server always enforces them anyway.
 | `users.assign_permissions` | Change a user's permissions |
 | `permissions.view` | Read the permission catalogue |
 | `audit_logs.view` | Read the security audit log |
-| `eseal.view` | Retrieve e-sealed documents by SANAD QR code (see `ESeal-Frontend.md`) |
+| `eseal.view` | Retrieve e-sealed documents by SANAD QR code (see `ESeal-Frontend.md`; the identity card holder in `IdentityCard-Frontend.md`) |
 
 Branch management doesn't use a permission: only `type === "superAdmin"` can manage branches.
 
@@ -445,6 +445,7 @@ Entries come newest first.
 - Settings: `passwordPolicyUpdated` (see `PasswordPolicy-Frontend.md`)
 
 QR scan counts for the dashboard: `GET /qr-sanad/stats` (see `ScanStats-Frontend.md`).
+The scans themselves, with search by national number or name: `GET /qr-sanad/scans` (see `Scans-Frontend.md`).
 
 ---
 

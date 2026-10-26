@@ -25,7 +25,8 @@ internal sealed class SecurityAuditService : ISecurityAuditService
         string? userName = null,
         Guid? actorId = null,
         Guid? branchId = null,
-        string? details = null)
+        string? details = null,
+        IdentityCard? identityCard = null)
     {
         this.repository.AddOnly(new SecurityAuditLog
         {
@@ -38,6 +39,7 @@ internal sealed class SecurityAuditService : ISecurityAuditService
             IpAddress = Normalizer.Truncate(client.IpAddress, 64),
             UserAgent = Normalizer.Truncate(client.UserAgent, 512),
             Details = Normalizer.Truncate(details, 2000),
+            IdentityCard = identityCard,
             CreatedAt = this.timeProvider.GetUtcNow().UtcDateTime
         });
     }

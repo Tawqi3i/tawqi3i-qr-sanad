@@ -11,6 +11,7 @@ using Tawqi3i.QrSanad.Common.Licensing;
 using Tawqi3i.QrSanad.Common.Persistence;
 using Tawqi3i.QrSanad.Common.Sanad;
 using Tawqi3i.QrSanad.Common.ViewModels.V1;
+using Tawqi3i.QrSanad.Domain.Factories;
 
 internal sealed class QRSanadService : IQRSanadService
 {
@@ -66,7 +67,8 @@ internal sealed class QRSanadService : IQRSanadService
             actor.Id,
             userName,
             branchId: actorAccess.BranchId,
-            details: details);
+            details: details,
+            identityCard: result.Data?.IdentityCard is { } card ? DomainModelFactory.CreateIdentityCard(card) : null);
 
         // MoDEE has already been called, so the scan is recorded even if the caller disconnects now.
         await this.unitOfWork.SaveChanges(CancellationToken.None);

@@ -6,6 +6,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="PdfPig" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Core\Tawqi3i.QrSanad.Common\Tawqi3i.QrSanad.Common.csproj" />
   </ItemGroup>
 

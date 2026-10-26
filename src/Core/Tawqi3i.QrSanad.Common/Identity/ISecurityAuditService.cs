@@ -1,5 +1,6 @@
 namespace Tawqi3i.QrSanad.Common.Identity;
 
+using Tawqi3i.QrSanad.Common.Domain.Models.V1;
 using Tawqi3i.QrSanad.Common.Dto.V1.Requests;
 using Tawqi3i.QrSanad.Common.Enums;
 
@@ -16,5 +17,6 @@ public interface ISecurityAuditService
         string? userName = null,
         Guid? actorId = null,
         Guid? branchId = null,
-        string? details = null);
+        string? details = null,
+        IdentityCard? identityCard = null);
 }

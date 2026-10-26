@@ -507,6 +507,71 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.SqlServer
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Tawqi3i.QrSanad.Common.Domain.Models.V1.SecurityAuditLog", b =>
+                {
+                    b.OwnsOne("Tawqi3i.QrSanad.Common.Domain.Models.V1.IdentityCard", "IdentityCard", b1 =>
+                        {
+                            b1.Property<Guid>("SecurityAuditLogId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("ArabicName")
+                                .IsRequired()
+                                .HasMaxLength(256)
+                                .HasColumnType("nvarchar(256)");
+
+                            b1.Property<DateOnly?>("BirthDate")
+                                .HasColumnType("date");
+
+                            b1.Property<string>("BloodType")
+                                .HasMaxLength(8)
+                                .HasColumnType("nvarchar(8)");
+
+                            b1.Property<string>("CardNumber")
+                                .HasMaxLength(32)
+                                .HasColumnType("nvarchar(32)");
+
+                            b1.Property<string>("EnglishName")
+                                .IsRequired()
+                                .HasMaxLength(256)
+                                .HasColumnType("nvarchar(256)");
+
+                            b1.Property<DateOnly?>("ExpiryDate")
+                                .HasColumnType("date");
+
+                            b1.Property<string>("Gender")
+                                .HasMaxLength(32)
+                                .HasColumnType("nvarchar(32)");
+
+                            b1.Property<string>("MotherName")
+                                .HasMaxLength(256)
+                                .HasColumnType("nvarchar(256)");
+
+                            b1.Property<string>("NationalNumber")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("nvarchar(10)");
+
+                            b1.Property<string>("RegistryNumber")
+                                .HasMaxLength(32)
+                                .HasColumnType("nvarchar(32)");
+
+                            b1.Property<string>("Residence")
+                                .HasMaxLength(256)
+                                .HasColumnType("nvarchar(256)");
+
+                            b1.HasKey("SecurityAuditLogId");
+
+                            b1.HasIndex("NationalNumber");
+
+                            b1.ToTable("SecurityAuditLogs");
+
+                            b1.WithOwner()
+                                .HasForeignKey("SecurityAuditLogId");
+                        });
+
+                    b.Navigation("IdentityCard");
+                });
+
             modelBuilder.Entity("Tawqi3i.QrSanad.Common.Domain.Models.V1.User", b =>
                 {
                     b.HasOne("Tawqi3i.QrSanad.Common.Domain.Models.V1.Branch", "Branch")

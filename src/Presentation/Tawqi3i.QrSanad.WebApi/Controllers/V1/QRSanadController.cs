@@ -6,6 +6,7 @@ using Tawqi3i.QrSanad.Common.Constants;
 using Tawqi3i.QrSanad.Common.Dto.V1.Requests.QRSanad;
 using Tawqi3i.QrSanad.Common.Dto.V1.Responses;
 using Tawqi3i.QrSanad.Common.ViewModels.V1;
+using Tawqi3i.QrSanad.Domain.Services.V1.Audit;
 using Tawqi3i.QrSanad.Domain.Services.V1.QRSanad;
 using Tawqi3i.QrSanad.Identity.Authorization;
 using Tawqi3i.QrSanad.WebApi.Common;
@@ -22,12 +23,18 @@ public class QRSanadController : ControllerBase
 {
     private readonly IQRSanadService qrSanadService;
     private readonly IScanStatsService scanStatsService;
+    private readonly ISecurityAuditLogsService auditLogsService;
     private readonly IStringLocalizer<SharedResource> localizer;
 
-    public QRSanadController(IQRSanadService qrSanadService, IScanStatsService scanStatsService, IStringLocalizer<SharedResource> localizer)
+    public QRSanadController(
+        IQRSanadService qrSanadService,
+        IScanStatsService scanStatsService,
+        ISecurityAuditLogsService auditLogsService,
+        IStringLocalizer<SharedResource> localizer)
     {
         this.qrSanadService = qrSanadService;
         this.scanStatsService = scanStatsService;
+        this.auditLogsService = auditLogsService;
         this.localizer = localizer;
     }
 
@@ -43,6 +50,22 @@ public class QRSanadController : ControllerBase
     public async Task<IActionResult> GetSealedDocument([FromBody] SealedDocRequest request, CancellationToken cancellationToken)
     {
         var result = await this.qrSanadService.GetSealedDocument(request, this.HttpContext.ExtractUser(), cancellationToken);
+
+        return this.HttpContext.ToObjectResult(result, this.localizer);
+    }
+
+    /// <summary>
+    /// The QR scans, newest first, with the identity card holder when there was one: all of them
+    /// for the SuperAdmin, the branch's for whoever holds audit_logs.view, otherwise the caller's
+    /// own. Search by national number or name.
+    /// </summary>
+    [HttpGet("scans"), HasPermission(PermissionCodes.ESeal.View)]
+    [ProducesResponseType(typeof(PagedResponse<SecurityAuditLogViewModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetScans([FromQuery] ScansQuery query, CancellationToken cancellationToken)
+    {
+        var result = await this.auditLogsService.GetScans(query, this.HttpContext.ExtractUser(), cancellationToken);
 
         return this.HttpContext.ToObjectResult(result, this.localizer);
     }

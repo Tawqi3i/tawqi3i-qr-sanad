@@ -103,7 +103,8 @@ internal sealed class SanadClient : IQRSanadClient
             return Response<SealedDocViewModel>.Succeed(new SealedDocViewModel
             {
                 SignedFile = result.FileContents,
-                ContentType = result.ContentType
+                ContentType = result.ContentType,
+                IdentityCard = this.ReadIdentityCard(result.FileContents, result.ContentType)
             });
         }
 
@@ -118,6 +119,28 @@ internal sealed class SanadClient : IQRSanadClient
         return result.Status == (int)HttpStatusCode.BadRequest
             ? Response<SealedDocViewModel>.Fail(result.Message ?? ResponseMessages.QrCodeInvalid)
             : Unavailable();
+    }
+
+    /// <summary>
+    /// The holder is extra: a document that cannot be read is still returned, just without it.
+    /// </summary>
+    private IdentityCardViewModel? ReadIdentityCard(string fileContents, string contentType)
+    {
+        if (contentType != SealedDocParser.DefaultContentType)
+        {
+            return null;
+        }
+
+        try
+        {
+            return IdentityCardReader.Read(Convert.FromBase64String(fileContents));
+        }
+        catch (Exception exception)
+        {
+            // The card holds personal data, so only the failure is logged, never its contents.
+            this.logger.LogWarning(exception, "Could not read the identity card from the sealed document.");
+            return null;
+        }
     }
 
     private static Response<SealedDocViewModel> Unavailable() =>

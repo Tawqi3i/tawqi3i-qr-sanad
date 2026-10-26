@@ -1,5 +1,6 @@
 namespace Tawqi3i.QrSanad.Domain.Services.V1;
 
+using Tawqi3i.QrSanad.Common.Constants;
 using Tawqi3i.QrSanad.Common.Domain.Models.V1;
 using Tawqi3i.QrSanad.Common.Dto.V1.Requests;
 using Tawqi3i.QrSanad.Common.Dto.V1.Responses;
@@ -59,6 +60,22 @@ internal sealed class AccessGuard
 
         var branchId = actor.BranchId;
         return logs.Where(a => a.BranchId == branchId && branchId != null);
+    }
+
+    /// <summary>
+    /// Restricts a query to the QR scans the actor may see: the audit entries they may see when they
+    /// hold audit_logs.view, otherwise only their own scans.
+    /// </summary>
+    public static IQueryable<SecurityAuditLog> ScansVisibleTo(IQueryable<SecurityAuditLog> logs, UserAccess actor)
+    {
+        var scans = logs.Where(a => a.EventType == SecurityEventType.QrScanSucceeded || a.EventType == SecurityEventType.QrScanFailed);
+        if (actor.HasPermission(PermissionCodes.AuditLogs.View))
+        {
+            return VisibleTo(scans, actor);
+        }
+
+        var userId = actor.UserId;
+        return scans.Where(a => a.UserId == userId);
     }
 
     public static bool CanGrant(UserAccess actor, IEnumerable<string> permissionCodes)

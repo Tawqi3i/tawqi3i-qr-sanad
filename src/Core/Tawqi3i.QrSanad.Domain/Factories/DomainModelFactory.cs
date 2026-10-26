@@ -7,6 +7,7 @@ using Tawqi3i.QrSanad.Common.Dto.V1.Requests.Users;
 using Tawqi3i.QrSanad.Common.Enums;
 using Tawqi3i.QrSanad.Common.Helpers;
 using Tawqi3i.QrSanad.Common.Security;
+using Tawqi3i.QrSanad.Common.ViewModels.V1;
 
 internal static class DomainModelFactory
 {
@@ -68,6 +69,24 @@ internal static class DomainModelFactory
             RequireLowercase = request.RequireLowercase,
             RequireDigit = request.RequireDigit,
             RequireNonAlphanumeric = request.RequireNonAlphanumeric
+        };
+    }
+
+    public static IdentityCard CreateIdentityCard(IdentityCardViewModel card)
+    {
+        return new IdentityCard
+        {
+            NationalNumber = card.NationalNumber,
+            ArabicName = card.ArabicName,
+            EnglishName = card.EnglishName,
+            Gender = card.Gender,
+            BloodType = card.BloodType,
+            BirthDate = card.BirthDate,
+            MotherName = card.MotherName,
+            RegistryNumber = card.RegistryNumber,
+            ExpiryDate = card.ExpiryDate,
+            Residence = card.Residence,
+            CardNumber = card.CardNumber
         };
     }
 

@@ -50,10 +50,8 @@ internal sealed class ScanStatsService : IScanStatsService
 
         var actorAccess = await this.accessGuard.GetActorAccess(actor, cancellationToken);
 
-        var scans = (await AccessGuard.VisibleTo(this.auditLogRepository.GetQueryable(), actorAccess)
-                .Where(a => (a.EventType == SecurityEventType.QrScanSucceeded || a.EventType == SecurityEventType.QrScanFailed)
-                    && a.CreatedAt >= from
-                    && a.CreatedAt < to)
+        var scans = (await AccessGuard.ScansVisibleTo(this.auditLogRepository.GetQueryable(), actorAccess)
+                .Where(a => a.CreatedAt >= from && a.CreatedAt < to)
                 .Select(a => new { a.CreatedAt, a.EventType, a.UserId, a.UserName, a.BranchId })
                 .ToListAsync(cancellationToken))
             .Select(a => new Scan(a.CreatedAt, a.EventType == SecurityEventType.QrScanSucceeded, a.UserId, a.UserName, a.BranchId))
