@@ -85,33 +85,14 @@ internal sealed class LicenseService : ILicenseService
         return this.CheckActive(license);
     }
 
-    public async Task<Response?> EnsureCanAddUser(CancellationToken cancellationToken = default)
-    {
-        var license = await this.GetInstalled(cancellationToken);
+    public Task<Response?> EnsureCanAddUser(CancellationToken cancellationToken = default) =>
+        this.EnsureRoom(a => a.MaxUsers, this.CountUsers, ResponseMessages.LicenseUserLimitReached, cancellationToken);
 
-        if (this.CheckActive(license) is { } denied)
-        {
-            return denied;
-        }
+    public Task<Response?> EnsureCanAddDevice(CancellationToken cancellationToken = default) =>
+        this.EnsureRoom(a => a.MaxDevices, this.CountDevices, ResponseMessages.LicenseDeviceLimitReached, cancellationToken);
 
-        return license!.MaxUsers is { } maxUsers && await this.CountUsers(cancellationToken) >= maxUsers
-            ? Response.Forbidden(ResponseMessages.LicenseUserLimitReached)
-            : null;
-    }
-
-    public async Task<Response?> EnsureCanAddBranch(CancellationToken cancellationToken = default)
-    {
-        var license = await this.GetInstalled(cancellationToken);
-
-        if (this.CheckActive(license) is { } denied)
-        {
-            return denied;
-        }
-
-        return license!.MaxBranches is { } maxBranches && await this.branchesRepository.GetQueryable().CountAsync(cancellationToken) >= maxBranches
-            ? Response.Forbidden(ResponseMessages.LicenseBranchLimitReached)
-            : null;
-    }
+    public Task<Response?> EnsureCanAddBranch(CancellationToken cancellationToken = default) =>
+        this.EnsureRoom(a => a.MaxBranches, this.CountBranches, ResponseMessages.LicenseBranchLimitReached, cancellationToken);
 
     /// <summary>
     /// The stored key, or the configured one if nothing valid is stored yet.
@@ -133,8 +114,32 @@ internal sealed class LicenseService : ILicenseService
         return license.IsExpired(this.Now) ? Response.Forbidden(ResponseMessages.LicenseExpired) : null;
     }
 
+    private async Task<Response?> EnsureRoom(
+        Func<LicenseData, int?> limit,
+        Func<CancellationToken, Task<int>> count,
+        string limitReachedMessage,
+        CancellationToken cancellationToken)
+    {
+        var license = await this.GetInstalled(cancellationToken);
+
+        if (this.CheckActive(license) is { } denied)
+        {
+            return denied;
+        }
+
+        return limit(license!) is { } max && await count(cancellationToken) >= max
+            ? Response.Forbidden(limitReachedMessage)
+            : null;
+    }
+
     private Task<int> CountUsers(CancellationToken cancellationToken) =>
-        this.usersRepository.GetQueryable().CountAsync(a => a.UserType != UserType.SuperAdmin, cancellationToken);
+        this.usersRepository.GetQueryable().CountAsync(a => a.UserType == UserType.Admin, cancellationToken);
+
+    private Task<int> CountDevices(CancellationToken cancellationToken) =>
+        this.usersRepository.GetQueryable().CountAsync(a => a.UserType == UserType.Device, cancellationToken);
+
+    private Task<int> CountBranches(CancellationToken cancellationToken) =>
+        this.branchesRepository.GetQueryable().CountAsync(cancellationToken);
 
     private async Task<LicenseViewModel> ToViewModel(LicenseData license, CancellationToken cancellationToken)
     {
@@ -150,8 +155,10 @@ internal sealed class LicenseService : ILicenseService
             DaysRemaining = Math.Max(0, (int)remaining.TotalDays),
             MaxUsers = license.MaxUsers,
             UsersCount = await this.CountUsers(cancellationToken),
+            MaxDevices = license.MaxDevices,
+            DevicesCount = await this.CountDevices(cancellationToken),
             MaxBranches = license.MaxBranches,
-            BranchesCount = await this.branchesRepository.GetQueryable().CountAsync(cancellationToken)
+            BranchesCount = await this.CountBranches(cancellationToken)
         };
     }
 }

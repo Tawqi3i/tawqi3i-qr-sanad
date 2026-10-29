@@ -13,8 +13,8 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(a => a.UserName).HasMaxLength(64).IsRequired();
         builder.Property(a => a.NormalizedUserName).HasMaxLength(64).IsRequired();
-        builder.Property(a => a.Email).HasMaxLength(256).IsRequired();
-        builder.Property(a => a.NormalizedEmail).HasMaxLength(256).IsRequired();
+        builder.Property(a => a.Email).HasMaxLength(256);
+        builder.Property(a => a.NormalizedEmail).HasMaxLength(256);
         builder.Property(a => a.DisplayName).HasMaxLength(128).IsRequired();
         builder.Property(a => a.PhoneNumber).HasMaxLength(32);
         builder.Property(a => a.UserType).HasConversion<string>().HasMaxLength(32).IsRequired();
@@ -29,7 +29,8 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .OnDelete(DeleteBehavior.Restrict);
 
         // Unique across deleted users too: a deleted user's username and email stay reserved,
-        // so audit entries keep pointing at one identity.
+        // so audit entries keep pointing at one identity. Devices have no email; the providers
+        // allow any number of nulls in the email index.
         builder.HasIndex(a => a.NormalizedUserName).IsUnique();
         builder.HasIndex(a => a.NormalizedEmail).IsUnique();
         builder.HasIndex(a => new { a.BranchId, a.UserType });

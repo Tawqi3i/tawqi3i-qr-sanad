@@ -14,6 +14,43 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.SqlServer
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Licenses",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Key = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Licenses", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PasswordPolicies",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MinLength = table.Column<int>(type: "int", nullable: false),
+                    MaxLength = table.Column<int>(type: "int", nullable: false),
+                    RequireUppercase = table.Column<bool>(type: "bit", nullable: false),
+                    RequireLowercase = table.Column<bool>(type: "bit", nullable: false),
+                    RequireDigit = table.Column<bool>(type: "bit", nullable: false),
+                    RequireNonAlphanumeric = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PasswordPolicies", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Permissions",
                 columns: table => new
                 {
@@ -39,6 +76,17 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.SqlServer
                     IpAddress = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
                     UserAgent = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: true),
                     Details = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
+                    IdentityCard_NationalNumber = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    IdentityCard_ArabicName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    IdentityCard_EnglishName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    IdentityCard_Gender = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
+                    IdentityCard_BloodType = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: true),
+                    IdentityCard_BirthDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    IdentityCard_MotherName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    IdentityCard_RegistryNumber = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
+                    IdentityCard_ExpiryDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    IdentityCard_Residence = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    IdentityCard_CardNumber = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -79,8 +127,8 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.SqlServer
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     DisplayName = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
                     UserType = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
@@ -172,14 +220,12 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.SqlServer
                 columns: new[] { "Id", "Code", "Description" },
                 values: new object[,]
                 {
-                    { new Guid("6b5dd7de-fed2-8a5b-8064-b4d9a2551f9d"), "users.update", "Update users, change their status and unlock them" },
-                    { new Guid("935d225d-1b6c-830d-916b-c94acbf35197"), "users.reset_password", "Reset another user's password" },
-                    { new Guid("9b5270e0-5623-8d12-bf45-ae8cd430b855"), "users.assign_permissions", "Grant and revoke user permissions" },
-                    { new Guid("a1885bbe-d02b-8363-bf99-25e9c4bad98d"), "users.create", "Create users in the branch" },
-                    { new Guid("b5b3840b-f1b5-8912-909e-80df84a42698"), "users.delete", "Delete users" },
-                    { new Guid("c7994376-f8e1-8e70-a2f6-5de3a6ea4963"), "permissions.view", "View the permission catalogue" },
-                    { new Guid("f969d5a8-1f29-8efb-b321-4e7cc4654082"), "audit_logs.view", "View the security audit log of the branch" },
-                    { new Guid("faebb80f-3f91-88d3-8344-93229a4b7798"), "users.view", "View the users of the branch" }
+                    { new Guid("10783350-fd27-8bdf-b482-312e51368dd5"), "devices.delete", "Delete devices" },
+                    { new Guid("920cd118-9c00-8f37-812b-fbd85f57d583"), "devices.view", "View the devices of the branch" },
+                    { new Guid("bae32de5-08ae-8c8a-becf-90af0e3cff7e"), "devices.reset_password", "Reset a device's password" },
+                    { new Guid("e5a41f90-777a-8164-879a-e3f813a4a800"), "devices.create", "Create devices in the branch" },
+                    { new Guid("f969d5a8-1f29-8efb-b321-4e7cc4654082"), "audit_logs.view", "View the security audit log and the scans of the branch" },
+                    { new Guid("fd38ee72-0175-8469-adb1-7daa12eb082e"), "devices.update", "Update devices, change their status and unlock them" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -230,6 +276,11 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.SqlServer
                 column: "CreatedAt");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SecurityAuditLogs_IdentityCard_NationalNumber",
+                table: "SecurityAuditLogs",
+                column: "IdentityCard_NationalNumber");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SecurityAuditLogs_UserId_CreatedAt",
                 table: "SecurityAuditLogs",
                 columns: new[] { "UserId", "CreatedAt" });
@@ -253,7 +304,8 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.SqlServer
                 name: "IX_Users_NormalizedEmail",
                 table: "Users",
                 column: "NormalizedEmail",
-                unique: true);
+                unique: true,
+                filter: "[NormalizedEmail] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_NormalizedUserName",
@@ -276,6 +328,12 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.SqlServer
             migrationBuilder.DropForeignKey(
                 name: "FK_Branches_Users_AdminUserId",
                 table: "Branches");
+
+            migrationBuilder.DropTable(
+                name: "Licenses");
+
+            migrationBuilder.DropTable(
+                name: "PasswordPolicies");
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");

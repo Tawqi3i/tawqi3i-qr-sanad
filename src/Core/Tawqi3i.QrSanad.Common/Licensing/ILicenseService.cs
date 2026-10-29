@@ -24,9 +24,14 @@ public interface ILicenseService
     Task<Response?> EnsureActive(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// <see cref="EnsureActive"/>, plus room for one more admin or user.
+    /// <see cref="EnsureActive"/>, plus room for one more admin.
     /// </summary>
     Task<Response?> EnsureCanAddUser(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// <see cref="EnsureActive"/>, plus room for one more device.
+    /// </summary>
+    Task<Response?> EnsureCanAddDevice(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// <see cref="EnsureActive"/>, plus room for one more branch.

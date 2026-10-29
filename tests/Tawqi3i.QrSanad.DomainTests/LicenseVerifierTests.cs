@@ -12,6 +12,7 @@ public class LicenseVerifierTests
         IssuedAt = new DateTime(2026, 10, 1, 0, 0, 0, DateTimeKind.Utc),
         ExpiresAt = new DateTime(2027, 1, 1, 0, 0, 0, DateTimeKind.Utc),
         MaxUsers = 10,
+        MaxDevices = 20,
         MaxBranches = 2
     };
 

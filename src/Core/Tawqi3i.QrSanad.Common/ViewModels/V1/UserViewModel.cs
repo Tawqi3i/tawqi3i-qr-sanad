@@ -8,7 +8,10 @@ public class UserViewModel
 
     public string UserName { get; set; } = string.Empty;
 
-    public string Email { get; set; } = string.Empty;
+    /// <summary>
+    /// Null for devices.
+    /// </summary>
+    public string? Email { get; set; }
 
     public string DisplayName { get; set; } = string.Empty;
 
@@ -38,7 +41,7 @@ public class UserViewModel
 public class UserDetailsViewModel : UserViewModel
 {
     /// <summary>
-    /// Everything the user can do. For the SuperAdmin, every code.
+    /// Everything the user can do. For the SuperAdmin, every code; for a device, none.
     /// </summary>
     public ICollection<string> Permissions { get; set; } = [];
 }

@@ -74,7 +74,7 @@ internal sealed class BranchesService : IBranchesService
                 .Take(query.PageSize))
             .ToListAsync(cancellationToken);
 
-        return PagedResponse<BranchViewModel>.Ok(items.Select(a => ViewModelFactory.Create(a.Branch, a.Admin, a.UsersCount)).ToList(), totalCount, query);
+        return PagedResponse<BranchViewModel>.Ok(items.Select(a => ViewModelFactory.Create(a.Branch, a.Admin, a.DevicesCount)).ToList(), totalCount, query);
     }
 
     public async Task<Response<BranchViewModel>> Get(Guid id, CancellationToken cancellationToken = default)
@@ -83,7 +83,7 @@ internal sealed class BranchesService : IBranchesService
 
         return item == null
             ? Response<BranchViewModel>.NotFound(ResponseMessages.BranchNotFound)
-            : Response<BranchViewModel>.Succeed(ViewModelFactory.Create(item.Branch, item.Admin, item.UsersCount));
+            : Response<BranchViewModel>.Succeed(ViewModelFactory.Create(item.Branch, item.Admin, item.DevicesCount));
     }
 
     public async Task<Response<BranchViewModel>> GetCurrent(RequestUser actor, CancellationToken cancellationToken = default)
@@ -212,7 +212,7 @@ internal sealed class BranchesService : IBranchesService
         {
             Branch = a,
             Admin = a.Admin,
-            UsersCount = a.Users.Count(u => !u.IsDeleted)
+            DevicesCount = a.Users.Count(u => !u.IsDeleted && u.UserType == UserType.Device)
         });
     }
 
@@ -239,6 +239,6 @@ internal sealed class BranchesService : IBranchesService
 
         public User? Admin { get; init; }
 
-        public int UsersCount { get; init; }
+        public int DevicesCount { get; init; }
     }
 }

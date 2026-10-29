@@ -19,14 +19,15 @@ From the command line instead:
 dotnet run --project tools/Tawqi3i.QrSanad.LicenseGenerator -- issue \
   --private-key <path-to-private.pem> \
   --customer "Customer name" --type PROD \
-  --days 365 --max-users 50 --max-branches 5
+  --days 365 --max-users 5 --max-devices 50 --max-branches 5
 ```
 
 | Option | Notes |
 |---|---|
 | `--type` | `TRIAL`, `PROD` or `DEV` |
 | `--days` or `--expires yyyy-MM-dd` | Expiry, UTC |
-| `--max-users` | Admins and users, not counting the SuperAdmin. Omit for unlimited |
+| `--max-users` | Admins, not counting the SuperAdmin. Omit for unlimited |
+| `--max-devices` | Omit for unlimited |
 | `--max-branches` | Omit for unlimited |
 
 The key is printed on one line. It goes either in `Licensing:Key` (appsettings or the

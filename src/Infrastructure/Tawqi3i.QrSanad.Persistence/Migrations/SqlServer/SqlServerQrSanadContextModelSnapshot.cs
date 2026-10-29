@@ -192,57 +192,39 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.SqlServer
                     b.HasData(
                         new
                         {
-                            Id = new Guid("faebb80f-3f91-88d3-8344-93229a4b7798"),
-                            Code = "users.view",
-                            Description = "View the users of the branch"
+                            Id = new Guid("920cd118-9c00-8f37-812b-fbd85f57d583"),
+                            Code = "devices.view",
+                            Description = "View the devices of the branch"
                         },
                         new
                         {
-                            Id = new Guid("a1885bbe-d02b-8363-bf99-25e9c4bad98d"),
-                            Code = "users.create",
-                            Description = "Create users in the branch"
+                            Id = new Guid("e5a41f90-777a-8164-879a-e3f813a4a800"),
+                            Code = "devices.create",
+                            Description = "Create devices in the branch"
                         },
                         new
                         {
-                            Id = new Guid("6b5dd7de-fed2-8a5b-8064-b4d9a2551f9d"),
-                            Code = "users.update",
-                            Description = "Update users, change their status and unlock them"
+                            Id = new Guid("fd38ee72-0175-8469-adb1-7daa12eb082e"),
+                            Code = "devices.update",
+                            Description = "Update devices, change their status and unlock them"
                         },
                         new
                         {
-                            Id = new Guid("b5b3840b-f1b5-8912-909e-80df84a42698"),
-                            Code = "users.delete",
-                            Description = "Delete users"
+                            Id = new Guid("10783350-fd27-8bdf-b482-312e51368dd5"),
+                            Code = "devices.delete",
+                            Description = "Delete devices"
                         },
                         new
                         {
-                            Id = new Guid("935d225d-1b6c-830d-916b-c94acbf35197"),
-                            Code = "users.reset_password",
-                            Description = "Reset another user's password"
-                        },
-                        new
-                        {
-                            Id = new Guid("9b5270e0-5623-8d12-bf45-ae8cd430b855"),
-                            Code = "users.assign_permissions",
-                            Description = "Grant and revoke user permissions"
-                        },
-                        new
-                        {
-                            Id = new Guid("c7994376-f8e1-8e70-a2f6-5de3a6ea4963"),
-                            Code = "permissions.view",
-                            Description = "View the permission catalogue"
+                            Id = new Guid("bae32de5-08ae-8c8a-becf-90af0e3cff7e"),
+                            Code = "devices.reset_password",
+                            Description = "Reset a device's password"
                         },
                         new
                         {
                             Id = new Guid("f969d5a8-1f29-8efb-b321-4e7cc4654082"),
                             Code = "audit_logs.view",
-                            Description = "View the security audit log of the branch"
-                        },
-                        new
-                        {
-                            Id = new Guid("8ac78524-d7b8-861f-9978-2a67584e06a8"),
-                            Code = "eseal.view",
-                            Description = "Retrieve e-sealed documents by SANAD QR code"
+                            Description = "View the security audit log and the scans of the branch"
                         });
                 });
 
@@ -386,7 +368,6 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.SqlServer
                         .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -403,7 +384,6 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.SqlServer
                         .HasColumnType("bit");
 
                     b.Property<string>("NormalizedEmail")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -455,7 +435,8 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.SqlServer
                     b.HasIndex("CreatedAt");
 
                     b.HasIndex("NormalizedEmail")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[NormalizedEmail] IS NOT NULL");
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique();

@@ -26,17 +26,18 @@ compiler settings are set in `Directory.Build.props`.
 
 | Level | Can |
 |---|---|
-| **SuperAdmin** | Exactly one, created at first startup. Creates and manages branches, creates one admin per branch, sees and manages everyone. Holds every permission. |
-| **Admin** | Belongs to one branch. Creates and manages that branch's users. Gets every permission by default; the SuperAdmin can narrow that. |
-| **User** | Belongs to one branch. Has only the permissions their admin granted. |
+| **SuperAdmin** | Exactly one, created at first startup. Creates and manages branches and their admins (`/users`), and the devices of every branch. Holds every permission. |
+| **Admin** | Belongs to one branch. Manages that branch's devices (`/devices`) and sees its audit log and scans. Gets every permission by default; the SuperAdmin can narrow that. |
+| **Device** | Belongs to one branch. The only type that can scan a QR code. Has no permissions and sees only its own scans. |
 
 Rules enforced by the API:
 
 - Each branch has at most one admin, and each admin belongs to exactly one branch. A unique index on `Branches.AdminUserId` enforces this. Deleting the admin frees the branch for a new one.
-- Outside the SuperAdmin, everyone sees only their own branch. Users in other branches return `404`, so their existence can't be confirmed.
-- Nobody can grant a permission they don't hold. Only admins (and the SuperAdmin) can revoke permissions they don't hold.
-- Disabling a branch locks out its admin and users on their next request. Activating it lets them back in. Deleting a branch (soft delete) also ends their sessions.
-- Nobody can disable, delete, reset or re-permission their own account through `/users`.
+- `/users` is the SuperAdmin's alone and lists everyone except devices. `/devices` lists devices only.
+- Outside the SuperAdmin, everyone sees only their own branch. Devices in other branches return `404`, so their existence can't be confirmed.
+- Disabling a branch locks out its admin and devices on their next request. Activating it lets them back in. Deleting a branch (soft delete) also ends their sessions.
+- Nobody can disable, delete, reset or re-permission their own account.
+- Signing in ends every other session of that account.
 
 Permissions are listed in `Common/Constants/PermissionCodes.cs` and seeded by the migrations.
 To add a permission, add a code there and add a migration for each provider (see below).
@@ -142,14 +143,15 @@ request sends `Accept-Language: ar`.
 
 The API needs a license key issued with `tools/Tawqi3i.QrSanad.LicenseGenerator` (see its README).
 A license names the customer and its type (TRIAL, PROD, DEV), and sets an expiry date and
-optional limits on users and branches. The key is signed with ECDSA P-256 and checked against the
+optional limits on users (admins), devices and branches. The key is signed with ECDSA P-256 and checked against the
 public key built into the API, so it cannot be edited.
 
 - **Startup:** without a valid key in `Licensing:Key` or the database, the API refuses to start. An
   expired license still starts, so the SuperAdmin can sign in and install a renewal.
-- **Expired:** QR scans, new users and new branches are refused with `403`. Everything else keeps working.
-- **Limits:** creating an admin or user past `maxUsers` (the SuperAdmin is not counted), or a branch
-  past `maxBranches`, is refused with `403`.
+- **Expired:** QR scans, new admins, new devices and new branches are refused with `403`. Everything else keeps working.
+- **Limits:** creating an admin past `maxUsers` (the SuperAdmin is not counted), a device past
+  `maxDevices`, or a branch past `maxBranches`, is refused with `403`. A key without `maxDevices`
+  allows unlimited devices.
 - **Renewal:** the SuperAdmin installs a key with `PUT /api/v1/license`, or it is set in
   `Licensing:Key`. At startup, the most recently issued license wins, even if it grants less. Every change is audited as `licenseUpdated`.
 

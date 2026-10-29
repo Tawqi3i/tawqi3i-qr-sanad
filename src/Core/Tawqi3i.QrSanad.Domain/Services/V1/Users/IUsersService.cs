@@ -6,14 +6,14 @@ using Tawqi3i.QrSanad.Common.Dto.V1.Responses;
 using Tawqi3i.QrSanad.Common.ViewModels.V1;
 
 /// <summary>
-/// Every operation is scoped to what the actor may see: the SuperAdmin sees all branches,
-/// everyone else only their own. Users outside that scope are reported as not found.
+/// The SuperAdmin's management of the branch admins. Devices are managed by IDevicesService and
+/// are reported as not found here.
 /// </summary>
 public interface IUsersService
 {
-    Task<PagedResponse<UserViewModel>> GetAll(UsersQuery query, RequestUser actor, CancellationToken cancellationToken = default);
+    Task<PagedResponse<UserViewModel>> GetAll(UsersQuery query, CancellationToken cancellationToken = default);
 
-    Task<Response<UserDetailsViewModel>> Get(Guid id, RequestUser actor, CancellationToken cancellationToken = default);
+    Task<Response<UserDetailsViewModel>> Get(Guid id, CancellationToken cancellationToken = default);
 
     Task<Response<UserDetailsViewModel>> Create(UserCreateRequest request, RequestUser actor, CancellationToken cancellationToken = default);
 

@@ -2,7 +2,6 @@ namespace Tawqi3i.QrSanad.WebApi.Controllers.V1;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using Tawqi3i.QrSanad.Common.Constants;
 using Tawqi3i.QrSanad.Common.Dto.V1.Responses;
 using Tawqi3i.QrSanad.Common.ViewModels.V1;
 using Tawqi3i.QrSanad.Domain.Services.V1.Permissions;
@@ -25,9 +24,9 @@ public class PermissionsController : ControllerBase
     }
 
     /// <summary>
-    /// Every permission code that can be assigned to roles and users.
+    /// Every permission code that can be assigned to an admin.
     /// </summary>
-    [HttpGet, HasPermission(PermissionCodes.Permissions.View)]
+    [HttpGet, SuperAdminOnly]
     [ProducesResponseType(typeof(Response<ICollection<PermissionViewModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {

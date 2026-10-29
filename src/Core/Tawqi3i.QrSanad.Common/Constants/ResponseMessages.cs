@@ -38,9 +38,10 @@ public static class ResponseMessages
     public const string UserNameTaken = "Username is already in use";
     public const string EmailTaken = "Email is already in use";
     public const string CannotModifySelf = "You cannot perform this action on your own account";
-    public const string CannotManageUser = "You cannot manage this user";
-    public const string CannotCreateUserType = "You cannot create this type of user";
     public const string UserUnlocked = "User unlocked successfully";
+
+    // Devices
+    public const string DeviceNotFound = "Device not found";
 
     // Branches
     public const string BranchNotFound = "Branch not found";
@@ -52,7 +53,6 @@ public static class ResponseMessages
 
     // Permissions
     public const string UnknownPermissions = "One or more permissions do not exist";
-    public const string PrivilegeEscalation = "You cannot grant or revoke permissions you do not have";
 
     // QR Sanad
     public const string QRSanadUnavailable = "The e-seal service is unavailable. Try again later";
@@ -63,6 +63,7 @@ public static class ResponseMessages
     public const string LicenseInvalid = "The license key is invalid";
     public const string LicenseExpired = "The license has expired. Contact your provider to renew it";
     public const string LicenseUserLimitReached = "The license user limit has been reached";
+    public const string LicenseDeviceLimitReached = "The license device limit has been reached";
     public const string LicenseBranchLimitReached = "The license branch limit has been reached";
     public const string LicenseUpdated = "License updated successfully";
     public const string ScanStatsRangeInvalid = "The start date must be before the end date, at most 92 days apart";

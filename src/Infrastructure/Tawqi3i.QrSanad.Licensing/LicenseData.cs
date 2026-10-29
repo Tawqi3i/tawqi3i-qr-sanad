@@ -17,9 +17,14 @@ public sealed record LicenseData
     public DateTime ExpiresAt { get; init; }
 
     /// <summary>
-    /// Admins and users allowed, not counting the SuperAdmin. Null means unlimited.
+    /// Admins allowed, not counting the SuperAdmin. Null means unlimited.
     /// </summary>
     public int? MaxUsers { get; init; }
+
+    /// <summary>
+    /// Null means unlimited, which is also what keys issued before devices existed grant.
+    /// </summary>
+    public int? MaxDevices { get; init; }
 
     /// <summary>
     /// Null means unlimited.
@@ -32,6 +37,8 @@ public sealed record LicenseData
     /// A one-line summary, for logs and the audit log.
     /// </summary>
     public override string ToString() =>
-        $"{this.Customer} ({this.Type}), until {this.ExpiresAt:yyyy-MM-dd}, users {this.MaxUsers?.ToString() ?? "unlimited"}, " +
-        $"branches {this.MaxBranches?.ToString() ?? "unlimited"}";
+        $"{this.Customer} ({this.Type}), until {this.ExpiresAt:yyyy-MM-dd}, users {Limit(this.MaxUsers)}, " +
+        $"devices {Limit(this.MaxDevices)}, branches {Limit(this.MaxBranches)}";
+
+    private static string Limit(int? value) => value?.ToString() ?? "unlimited";
 }

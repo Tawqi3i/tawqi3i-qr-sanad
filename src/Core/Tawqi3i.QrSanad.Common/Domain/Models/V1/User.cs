@@ -8,18 +8,21 @@ public class User : AuditableEntity
 
     public string NormalizedUserName { get; set; } = string.Empty;
 
-    public string Email { get; set; } = string.Empty;
+    /// <summary>
+    /// Required for admins and the SuperAdmin; devices have none.
+    /// </summary>
+    public string? Email { get; set; }
 
-    public string NormalizedEmail { get; set; } = string.Empty;
+    public string? NormalizedEmail { get; set; }
 
     public string DisplayName { get; set; } = string.Empty;
 
     public string? PhoneNumber { get; set; }
 
-    public UserType UserType { get; set; } = UserType.User;
+    public UserType UserType { get; set; }
 
     /// <summary>
-    /// Required for admins and users; null only for the SuperAdmin.
+    /// Required for admins and devices; null only for the SuperAdmin.
     /// </summary>
     public Guid? BranchId { get; set; }
 

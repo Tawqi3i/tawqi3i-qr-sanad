@@ -21,11 +21,18 @@ public class LicenseViewModel
     public int DaysRemaining { get; set; }
 
     /// <summary>
-    /// Admins and users allowed, not counting the SuperAdmin. Null means unlimited.
+    /// Admins allowed, not counting the SuperAdmin. Null means unlimited.
     /// </summary>
     public int? MaxUsers { get; set; }
 
     public int UsersCount { get; set; }
+
+    /// <summary>
+    /// Null means unlimited.
+    /// </summary>
+    public int? MaxDevices { get; set; }
+
+    public int DevicesCount { get; set; }
 
     /// <summary>
     /// Null means unlimited.

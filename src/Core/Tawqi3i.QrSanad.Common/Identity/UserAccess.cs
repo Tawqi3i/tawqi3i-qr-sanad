@@ -27,11 +27,13 @@ public sealed class UserAccess
     public bool MustChangePassword { get; init; }
 
     /// <summary>
-    /// For the SuperAdmin, every code.
+    /// For the SuperAdmin, every code; for a device, none.
     /// </summary>
     public string[] Permissions { get; init; } = [];
 
     public bool IsSuperAdmin => this.UserType == UserType.SuperAdmin;
+
+    public bool IsDevice => this.UserType == UserType.Device;
 
     public bool HasPermission(string code) => this.IsSuperAdmin || this.Permissions.Contains(code, StringComparer.Ordinal);
 }

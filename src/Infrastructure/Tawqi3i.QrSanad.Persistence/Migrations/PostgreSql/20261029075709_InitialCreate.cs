@@ -14,6 +14,43 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.PostgreSql
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "licenses",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    key = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_licenses", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "password_policies",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    min_length = table.Column<int>(type: "integer", nullable: false),
+                    max_length = table.Column<int>(type: "integer", nullable: false),
+                    require_uppercase = table.Column<bool>(type: "boolean", nullable: false),
+                    require_lowercase = table.Column<bool>(type: "boolean", nullable: false),
+                    require_digit = table.Column<bool>(type: "boolean", nullable: false),
+                    require_non_alphanumeric = table.Column<bool>(type: "boolean", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_password_policies", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "permissions",
                 columns: table => new
                 {
@@ -39,6 +76,17 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.PostgreSql
                     ip_address = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     user_agent = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true),
                     details = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    identity_card_national_number = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
+                    identity_card_arabic_name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    identity_card_english_name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    identity_card_gender = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
+                    identity_card_blood_type = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: true),
+                    identity_card_birth_date = table.Column<DateOnly>(type: "date", nullable: true),
+                    identity_card_mother_name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    identity_card_registry_number = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
+                    identity_card_expiry_date = table.Column<DateOnly>(type: "date", nullable: true),
+                    identity_card_residence = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    identity_card_card_number = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -79,8 +127,8 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.PostgreSql
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     user_name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     normalized_user_name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    normalized_email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    normalized_email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     display_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     phone_number = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
                     user_type = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
@@ -172,14 +220,12 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.PostgreSql
                 columns: new[] { "id", "code", "description" },
                 values: new object[,]
                 {
-                    { new Guid("6b5dd7de-fed2-8a5b-8064-b4d9a2551f9d"), "users.update", "Update users, change their status and unlock them" },
-                    { new Guid("935d225d-1b6c-830d-916b-c94acbf35197"), "users.reset_password", "Reset another user's password" },
-                    { new Guid("9b5270e0-5623-8d12-bf45-ae8cd430b855"), "users.assign_permissions", "Grant and revoke user permissions" },
-                    { new Guid("a1885bbe-d02b-8363-bf99-25e9c4bad98d"), "users.create", "Create users in the branch" },
-                    { new Guid("b5b3840b-f1b5-8912-909e-80df84a42698"), "users.delete", "Delete users" },
-                    { new Guid("c7994376-f8e1-8e70-a2f6-5de3a6ea4963"), "permissions.view", "View the permission catalogue" },
-                    { new Guid("f969d5a8-1f29-8efb-b321-4e7cc4654082"), "audit_logs.view", "View the security audit log of the branch" },
-                    { new Guid("faebb80f-3f91-88d3-8344-93229a4b7798"), "users.view", "View the users of the branch" }
+                    { new Guid("10783350-fd27-8bdf-b482-312e51368dd5"), "devices.delete", "Delete devices" },
+                    { new Guid("920cd118-9c00-8f37-812b-fbd85f57d583"), "devices.view", "View the devices of the branch" },
+                    { new Guid("bae32de5-08ae-8c8a-becf-90af0e3cff7e"), "devices.reset_password", "Reset a device's password" },
+                    { new Guid("e5a41f90-777a-8164-879a-e3f813a4a800"), "devices.create", "Create devices in the branch" },
+                    { new Guid("f969d5a8-1f29-8efb-b321-4e7cc4654082"), "audit_logs.view", "View the security audit log and the scans of the branch" },
+                    { new Guid("fd38ee72-0175-8469-adb1-7daa12eb082e"), "devices.update", "Update devices, change their status and unlock them" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -228,6 +274,11 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.PostgreSql
                 column: "created_at");
 
             migrationBuilder.CreateIndex(
+                name: "ix_security_audit_logs_identity_card_national_number",
+                table: "security_audit_logs",
+                column: "identity_card_national_number");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_security_audit_logs_user_id_created_at",
                 table: "security_audit_logs",
                 columns: new[] { "user_id", "created_at" });
@@ -274,6 +325,12 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.PostgreSql
             migrationBuilder.DropForeignKey(
                 name: "fk_branches_users_admin_user_id",
                 table: "branches");
+
+            migrationBuilder.DropTable(
+                name: "licenses");
+
+            migrationBuilder.DropTable(
+                name: "password_policies");
 
             migrationBuilder.DropTable(
                 name: "refresh_tokens");

@@ -4,26 +4,21 @@ namespace Tawqi3i.QrSanad.Common.Constants;
 /// The permission catalogue. Every code is seeded into the Permissions table by the migrations
 /// (see SeedsFactory) and checked on endpoints with [HasPermission].
 ///
-/// The SuperAdmin holds all of them implicitly. A new admin receives all of them unless the
-/// SuperAdmin chooses otherwise, and can pass on to their branch's users only what they hold.
+/// Permissions are held by admins only. The SuperAdmin holds all of them implicitly; a new admin
+/// receives all of them unless the SuperAdmin chooses otherwise. Devices hold none: scanning is
+/// decided by the user type, not by a permission.
 ///
 /// Adding a code means adding a migration for each provider so the row exists.
 /// </summary>
 public static class PermissionCodes
 {
-    public static class Users
+    public static class Devices
     {
-        public const string View = "users.view";
-        public const string Create = "users.create";
-        public const string Update = "users.update";
-        public const string Delete = "users.delete";
-        public const string ResetPassword = "users.reset_password";
-        public const string AssignPermissions = "users.assign_permissions";
-    }
-
-    public static class Permissions
-    {
-        public const string View = "permissions.view";
+        public const string View = "devices.view";
+        public const string Create = "devices.create";
+        public const string Update = "devices.update";
+        public const string Delete = "devices.delete";
+        public const string ResetPassword = "devices.reset_password";
     }
 
     public static class AuditLogs
@@ -31,25 +26,14 @@ public static class PermissionCodes
         public const string View = "audit_logs.view";
     }
 
-    public static class ESeal
-    {
-        public const string View = "eseal.view";
-    }
-
     public static IReadOnlyList<PermissionDefinition> All { get; } =
     [
-        new(Users.View, "View the users of the branch"),
-        new(Users.Create, "Create users in the branch"),
-        new(Users.Update, "Update users, change their status and unlock them"),
-        new(Users.Delete, "Delete users"),
-        new(Users.ResetPassword, "Reset another user's password"),
-        new(Users.AssignPermissions, "Grant and revoke user permissions"),
-
-        new(Permissions.View, "View the permission catalogue"),
-
-        new(AuditLogs.View, "View the security audit log of the branch"),
-
-        new(ESeal.View, "Retrieve e-sealed documents by SANAD QR code"),
+        new(Devices.View, "View the devices of the branch"),
+        new(Devices.Create, "Create devices in the branch"),
+        new(Devices.Update, "Update devices, change their status and unlock them"),
+        new(Devices.Delete, "Delete devices"),
+        new(Devices.ResetPassword, "Reset a device's password"),
+        new(AuditLogs.View, "View the security audit log and the scans of the branch"),
     ];
 
     public static IReadOnlyList<string> AllCodes { get; } = All.Select(a => a.Code).ToList();

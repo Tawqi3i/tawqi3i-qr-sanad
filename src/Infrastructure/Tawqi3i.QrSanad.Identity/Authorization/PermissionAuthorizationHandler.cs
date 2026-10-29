@@ -6,8 +6,8 @@ using Tawqi3i.QrSanad.Common.Constants;
 using Tawqi3i.QrSanad.Common.Identity;
 
 /// <summary>
-/// Evaluates [HasPermission] and [SuperAdminOnly] against the live, cached access snapshot.
-/// While a password change is pending, both refuse with a reason the client can show.
+/// Evaluates [HasPermission], [SuperAdminOnly] and [DeviceOnly] against the live, cached access
+/// snapshot. While a password change is pending, all of them refuse with a reason the client can show.
 /// </summary>
 internal sealed class PermissionAuthorizationHandler : IAuthorizationHandler
 {
@@ -21,7 +21,7 @@ internal sealed class PermissionAuthorizationHandler : IAuthorizationHandler
     public async Task HandleAsync(AuthorizationHandlerContext context)
     {
         var requirements = context.PendingRequirements
-            .Where(a => a is PermissionRequirement or SuperAdminRequirement)
+            .Where(a => a is PermissionRequirement or SuperAdminRequirement or DeviceRequirement)
             .ToList();
 
         if (requirements.Count == 0)
@@ -55,6 +55,7 @@ internal sealed class PermissionAuthorizationHandler : IAuthorizationHandler
             {
                 PermissionRequirement permission => access.HasPermission(permission.Permission),
                 SuperAdminRequirement => access.IsSuperAdmin,
+                DeviceRequirement => access.IsDevice,
                 _ => false
             };
 

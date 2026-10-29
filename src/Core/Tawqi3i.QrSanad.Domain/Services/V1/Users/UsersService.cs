@@ -14,147 +14,62 @@ using Tawqi3i.QrSanad.Common.Persistence;
 using Tawqi3i.QrSanad.Common.ViewModels.V1;
 using Tawqi3i.QrSanad.Domain.Factories;
 
+/// <summary>
+/// Reached only by the SuperAdmin ([SuperAdminOnly]). Apart from the SuperAdmin itself, every
+/// account here is a branch admin.
+/// </summary>
 internal sealed class UsersService : IUsersService
 {
-    private const string AdminActionReason = "admin_action";
-
     private readonly IUsersRepository usersRepository;
-    private readonly IBranchesRepository branchesRepository;
     private readonly IPermissionsRepository permissionsRepository;
-    private readonly IRefreshTokensRepository refreshTokensRepository;
     private readonly IUnitOfWork unitOfWork;
-    private readonly IPasswordService passwordService;
     private readonly IUserAccessProvider accessProvider;
     private readonly ISecurityAuditService auditService;
-    private readonly AccessGuard accessGuard;
-    private readonly IPasswordPolicyRepository passwordPolicyRepository;
     private readonly ILicenseService licenseService;
-    private readonly TimeProvider timeProvider;
+    private readonly AccountOperations accounts;
 
     public UsersService(
         IUsersRepository usersRepository,
-        IBranchesRepository branchesRepository,
         IPermissionsRepository permissionsRepository,
-        IRefreshTokensRepository refreshTokensRepository,
         IUnitOfWork unitOfWork,
-        IPasswordService passwordService,
         IUserAccessProvider accessProvider,
         ISecurityAuditService auditService,
-        AccessGuard accessGuard,
-        IPasswordPolicyRepository passwordPolicyRepository,
         ILicenseService licenseService,
-        TimeProvider timeProvider)
+        AccountOperations accounts)
     {
         this.usersRepository = usersRepository;
-        this.branchesRepository = branchesRepository;
         this.permissionsRepository = permissionsRepository;
-        this.refreshTokensRepository = refreshTokensRepository;
         this.unitOfWork = unitOfWork;
-        this.passwordService = passwordService;
         this.accessProvider = accessProvider;
         this.auditService = auditService;
-        this.accessGuard = accessGuard;
-        this.passwordPolicyRepository = passwordPolicyRepository;
         this.licenseService = licenseService;
-        this.timeProvider = timeProvider;
+        this.accounts = accounts;
     }
 
-    private DateTime Now => this.timeProvider.GetUtcNow().UtcDateTime;
-
-    public async Task<PagedResponse<UserViewModel>> GetAll(UsersQuery query, RequestUser actor, CancellationToken cancellationToken = default)
+    public Task<PagedResponse<UserViewModel>> GetAll(UsersQuery query, CancellationToken cancellationToken = default)
     {
-        var actorAccess = await this.accessGuard.GetActorAccess(actor, cancellationToken);
-        var users = AccessGuard.VisibleTo(this.usersRepository.GetQueryable(), actorAccess);
-
-        if (!string.IsNullOrWhiteSpace(query.Search))
-        {
-            var term = Normalizer.Normalize(query.Search);
-            users = users.Where(a => a.NormalizedUserName.Contains(term) || a.NormalizedEmail.Contains(term) || a.DisplayName.ToUpper().Contains(term));
-        }
-
-        if (query.Status is { } status)
-        {
-            users = users.Where(a => a.Status == status);
-        }
-
-        if (query.Type is { } type)
-        {
-            users = users.Where(a => a.UserType == type);
-        }
-
-        if (query.BranchId is { } branchId)
-        {
-            users = users.Where(a => a.BranchId == branchId);
-        }
-
-        var totalCount = await users.CountAsync(cancellationToken);
-
-        var items = await users
-            .Include(a => a.Branch)
-            .OrderByDescending(a => a.CreatedAt)
-            .ThenBy(a => a.Id)
-            .Skip(query.Skip)
-            .Take(query.PageSize)
-            .ToListAsync(cancellationToken);
-
-        return ViewModelFactory.CreatePaginated(items, totalCount, query, this.Now);
+        return this.accounts.GetPage(AccessGuard.Users(this.usersRepository.GetQueryable()), query, cancellationToken);
     }
 
-    public async Task<Response<UserDetailsViewModel>> Get(Guid id, RequestUser actor, CancellationToken cancellationToken = default)
+    public async Task<Response<UserDetailsViewModel>> Get(Guid id, CancellationToken cancellationToken = default)
     {
-        var actorAccess = await this.accessGuard.GetActorAccess(actor, cancellationToken);
-        var visible = await AccessGuard.VisibleTo(this.usersRepository.GetQueryable(), actorAccess).AnyAsync(a => a.Id == id, cancellationToken);
+        var exists = await AccessGuard.Users(this.usersRepository.GetQueryable()).AnyAsync(a => a.Id == id, cancellationToken);
 
-        return visible
-            ? await this.GetDetails(id, cancellationToken)
+        return exists
+            ? await this.accounts.GetDetails(id, cancellationToken)
             : Response<UserDetailsViewModel>.NotFound(ResponseMessages.UserNotFound);
     }
 
     public async Task<Response<UserDetailsViewModel>> Create(UserCreateRequest request, RequestUser actor, CancellationToken cancellationToken = default)
     {
-        var actorAccess = await this.accessGuard.GetActorAccess(actor, cancellationToken);
+        var (branch, branchDenied) = await this.accounts.GetActiveBranch(request.BranchId!.Value, cancellationToken);
 
-        // The SuperAdmin creates admins and users for any branch; anyone else creates plain
-        // users in their own branch only.
-        Guid branchId;
-
-        if (actorAccess.IsSuperAdmin)
+        if (branchDenied != null)
         {
-            if (request.Type == UserType.SuperAdmin)
-            {
-                return Response<UserDetailsViewModel>.Forbidden(ResponseMessages.CannotCreateUserType);
-            }
-
-            if (request.BranchId is not { } requestedBranchId)
-            {
-                return Response<UserDetailsViewModel>.Fail(ResponseMessages.BranchRequired);
-            }
-
-            branchId = requestedBranchId;
-        }
-        else
-        {
-            if (request.Type != UserType.User || actorAccess.BranchId is null || (request.BranchId != null && request.BranchId != actorAccess.BranchId))
-            {
-                return Response<UserDetailsViewModel>.Forbidden(ResponseMessages.CannotCreateUserType);
-            }
-
-            branchId = actorAccess.BranchId.Value;
+            return Response<UserDetailsViewModel>.From(branchDenied);
         }
 
-        var branch = await this.branchesRepository.GetTrackedQueryable().FirstOrDefaultAsync(a => a.Id == branchId, cancellationToken);
-
-        if (branch == null)
-        {
-            return Response<UserDetailsViewModel>.NotFound(ResponseMessages.BranchNotFound);
-        }
-
-        if (branch.Status != BranchStatus.Active)
-        {
-            return Response<UserDetailsViewModel>.Fail(ResponseMessages.BranchInactive);
-        }
-
-        if (request.Type == UserType.Admin && branch.AdminUserId != null)
+        if (branch!.AdminUserId != null)
         {
             return Response<UserDetailsViewModel>.Conflict(ResponseMessages.BranchHasAdmin);
         }
@@ -164,27 +79,15 @@ internal sealed class UsersService : IUsersService
             return Response<UserDetailsViewModel>.From(licenseDenied);
         }
 
-        var passwordPolicy = await this.passwordPolicyRepository.GetCurrent(cancellationToken);
-
-        if (!passwordPolicy.IsSatisfiedBy(request.Password))
+        if (await this.accounts.ValidateNewAccount(request.UserName, request.Email, request.Password, cancellationToken) is { } invalid)
         {
-            return Response<UserDetailsViewModel>.Fail(ResponseMessages.PasswordTooWeak);
+            return Response<UserDetailsViewModel>.From(invalid);
         }
-
-        if (await this.usersRepository.UserNameExists(Normalizer.Normalize(request.UserName), cancellationToken: cancellationToken))
-        {
-            return Response<UserDetailsViewModel>.Conflict(ResponseMessages.UserNameTaken);
-        }
-
-        if (await this.usersRepository.EmailExists(Normalizer.Normalize(request.Email), cancellationToken: cancellationToken))
-        {
-            return Response<UserDetailsViewModel>.Conflict(ResponseMessages.EmailTaken);
-        }
-
-        var codes = NormaliseCodes(request.Permissions);
 
         // A new admin gets every permission unless the SuperAdmin chose a narrower set.
-        if (request.Type == UserType.Admin && codes.Count == 0)
+        var codes = NormaliseCodes(request.Permissions);
+
+        if (codes.Count == 0)
         {
             codes = PermissionCodes.AllCodes.ToList();
         }
@@ -196,31 +99,17 @@ internal sealed class UsersService : IUsersService
             return Response<UserDetailsViewModel>.Fail(ResponseMessages.UnknownPermissions);
         }
 
-        if (!AccessGuard.CanGrant(actorAccess, codes))
-        {
-            return Response<UserDetailsViewModel>.Forbidden(ResponseMessages.PrivilegeEscalation);
-        }
+        var admin = DomainModelFactory.CreateAdmin(request, branch.Id, this.accounts.HashPassword(request.Password), permissions, actor.Id, this.accounts.Now);
 
-        var user = DomainModelFactory.CreateUser(request, this.passwordService.Hash(request.Password), branch.Id, permissions, actor.Id, this.Now);
+        branch.AdminUserId = admin.Id;
+        branch.ConcurrencyStamp = Generator.NewStamp();
 
-        this.usersRepository.AddOnly(user);
-
-        if (user.UserType == UserType.Admin)
-        {
-            branch.AdminUserId = user.Id;
-            branch.ConcurrencyStamp = Generator.NewStamp();
-        }
-
-        this.auditService.Record(SecurityEventType.UserCreated, actor, user.Id, user.UserName, actor.Id, branch.Id, $"{user.UserType} of branch {branch.Name}");
-        await this.unitOfWork.SaveChanges(cancellationToken);
-
-        var created = await this.GetDetails(user.Id, cancellationToken);
-        return Response<UserDetailsViewModel>.Created(created.Data!);
+        return await this.accounts.Add(admin, branch, actor, cancellationToken);
     }
 
     public async Task<Response<UserDetailsViewModel>> Update(Guid id, UserUpdateRequest request, RequestUser actor, CancellationToken cancellationToken = default)
     {
-        var (user, denied) = await this.FindManageable(id, actor, allowSelf: true, cancellationToken);
+        var (user, denied) = await this.Find(id, actor, allowSelf: true, cancellationToken);
 
         if (denied != null)
         {
@@ -239,144 +128,42 @@ internal sealed class UsersService : IUsersService
         user.NormalizedEmail = normalizedEmail;
         user.DisplayName = request.DisplayName.Trim();
         user.PhoneNumber = DomainModelFactory.NullIfBlank(request.PhoneNumber);
-        user.ConcurrencyStamp = Generator.NewStamp();
 
-        this.auditService.Record(SecurityEventType.UserUpdated, actor, user.Id, user.UserName, actor.Id, user.BranchId);
-        await this.unitOfWork.SaveChanges(cancellationToken);
-
-        return await this.GetDetails(id, cancellationToken);
+        return await this.accounts.SaveUpdate(user, actor, cancellationToken);
     }
 
     public async Task<Response> SetStatus(Guid id, UserStatusRequest request, RequestUser actor, CancellationToken cancellationToken = default)
     {
-        var (user, denied) = await this.FindManageable(id, actor, allowSelf: false, cancellationToken);
+        var (user, denied) = await this.Find(id, actor, allowSelf: false, cancellationToken);
 
-        if (denied != null)
-        {
-            return denied;
-        }
-
-        if (user!.Status == request.Status)
-        {
-            return Response.Succeed(ResponseMessages.Updated);
-        }
-
-        var previous = user.Status;
-        user.Status = request.Status;
-        user.ConcurrencyStamp = Generator.NewStamp();
-
-        if (request.Status == UserStatus.Disabled)
-        {
-            // Ends every session: access and refresh tokens carry the old stamp.
-            user.SecurityStamp = Generator.NewStamp();
-        }
-
-        await this.SaveAndEndSessions(
-            user,
-            endSessions: request.Status == UserStatus.Disabled,
-            () => this.auditService.Record(SecurityEventType.UserStatusChanged, actor, user.Id, user.UserName, actor.Id, user.BranchId, $"{previous} -> {request.Status}"),
-            actor,
-            cancellationToken);
-
-        return Response.Succeed(ResponseMessages.Updated);
+        return denied ?? await this.accounts.SetStatus(user!, request, actor, cancellationToken);
     }
 
     public async Task<Response> Unlock(Guid id, RequestUser actor, CancellationToken cancellationToken = default)
     {
-        var (user, denied) = await this.FindManageable(id, actor, allowSelf: false, cancellationToken);
+        var (user, denied) = await this.Find(id, actor, allowSelf: false, cancellationToken);
 
-        if (denied != null)
-        {
-            return denied;
-        }
-
-        user!.AccessFailedCount = 0;
-        user.LockoutEnd = null;
-        user.ConcurrencyStamp = Generator.NewStamp();
-
-        this.auditService.Record(SecurityEventType.UserUnlocked, actor, user.Id, user.UserName, actor.Id, user.BranchId);
-        await this.unitOfWork.SaveChanges(cancellationToken);
-
-        return Response.Succeed(ResponseMessages.UserUnlocked);
+        return denied ?? await this.accounts.Unlock(user!, actor, cancellationToken);
     }
 
     public async Task<Response> ResetPassword(Guid id, ResetPasswordRequest request, RequestUser actor, CancellationToken cancellationToken = default)
     {
         // Your own password goes through auth/password, which checks the current one.
-        var (user, denied) = await this.FindManageable(id, actor, allowSelf: false, cancellationToken);
+        var (user, denied) = await this.Find(id, actor, allowSelf: false, cancellationToken);
 
-        if (denied != null)
-        {
-            return denied;
-        }
-
-        var passwordPolicy = await this.passwordPolicyRepository.GetCurrent(cancellationToken);
-
-        if (!passwordPolicy.IsSatisfiedBy(request.NewPassword))
-        {
-            return Response.Fail(ResponseMessages.PasswordTooWeak);
-        }
-
-        user!.PasswordHash = this.passwordService.Hash(request.NewPassword);
-        user.PasswordChangedAt = this.Now;
-        user.MustChangePassword = request.MustChangePassword;
-        user.AccessFailedCount = 0;
-        user.LockoutEnd = null;
-        user.SecurityStamp = Generator.NewStamp();
-        user.ConcurrencyStamp = Generator.NewStamp();
-
-        await this.SaveAndEndSessions(
-            user,
-            endSessions: true,
-            () => this.auditService.Record(SecurityEventType.PasswordReset, actor, user.Id, user.UserName, actor.Id, user.BranchId),
-            actor,
-            cancellationToken);
-
-        return Response.Succeed(ResponseMessages.PasswordReset);
+        return denied ?? await this.accounts.ResetPassword(user!, request, actor, cancellationToken);
     }
 
     public async Task<Response> Delete(Guid id, RequestUser actor, CancellationToken cancellationToken = default)
     {
-        var (user, denied) = await this.FindManageable(id, actor, allowSelf: false, cancellationToken);
+        var (user, denied) = await this.Find(id, actor, allowSelf: false, cancellationToken);
 
-        if (denied != null)
-        {
-            return denied;
-        }
-
-        // Soft delete: the row stays for the audit trail, the username and email stay reserved.
-        user!.IsDeleted = true;
-        user.DeletedAt = this.Now;
-        user.DeletedBy = actor.Id;
-        user.Status = UserStatus.Disabled;
-        user.SecurityStamp = Generator.NewStamp();
-        user.ConcurrencyStamp = Generator.NewStamp();
-
-        // Frees the branch so the SuperAdmin can create its next admin.
-        if (user.UserType == UserType.Admin)
-        {
-            var branch = await this.branchesRepository.GetTrackedQueryable().FirstOrDefaultAsync(a => a.AdminUserId == user.Id, cancellationToken);
-
-            if (branch != null)
-            {
-                branch.AdminUserId = null;
-                branch.ConcurrencyStamp = Generator.NewStamp();
-            }
-        }
-
-        await this.SaveAndEndSessions(
-            user,
-            endSessions: true,
-            () => this.auditService.Record(SecurityEventType.UserDeleted, actor, user.Id, user.UserName, actor.Id, user.BranchId),
-            actor,
-            cancellationToken);
-
-        return Response.Succeed(ResponseMessages.Deleted);
+        return denied ?? await this.accounts.Delete(user!, actor, cancellationToken);
     }
 
     public async Task<Response<UserDetailsViewModel>> SetPermissions(Guid id, PermissionsRequest request, RequestUser actor, CancellationToken cancellationToken = default)
     {
-        var (user, denied) = await this.FindManageable(id, actor, allowSelf: false, cancellationToken, includePermissions: true);
+        var (user, denied) = await this.Find(id, actor, allowSelf: false, cancellationToken, includePermissions: true);
 
         if (denied != null)
         {
@@ -395,19 +182,12 @@ internal sealed class UsersService : IUsersService
         var added = permissions.Where(a => !currentCodes.Contains(a.Code)).ToList();
         var removed = user.UserPermissions.Where(a => !requestedCodes.Contains(a.Permission.Code, StringComparer.Ordinal)).ToList();
 
-        var actorAccess = await this.accessGuard.GetActorAccess(actor, cancellationToken);
-
-        if (!AccessGuard.CanChangePermissions(actorAccess, added.Select(a => a.Code), removed.Select(a => a.Permission.Code)))
-        {
-            return Response<UserDetailsViewModel>.Forbidden(ResponseMessages.PrivilegeEscalation);
-        }
-
         if (added.Count == 0 && removed.Count == 0)
         {
-            return await this.GetDetails(id, cancellationToken);
+            return await this.accounts.GetDetails(id, cancellationToken);
         }
 
-        var now = this.Now;
+        var now = this.accounts.Now;
 
         foreach (var userPermission in removed)
         {
@@ -433,7 +213,7 @@ internal sealed class UsersService : IUsersService
         await this.unitOfWork.SaveChanges(cancellationToken);
         await this.accessProvider.Invalidate(user.Id, cancellationToken);
 
-        return await this.GetDetails(id, cancellationToken);
+        return await this.accounts.GetDetails(id, cancellationToken);
     }
 
     private static List<string> NormaliseCodes(IEnumerable<string> codes)
@@ -442,37 +222,16 @@ internal sealed class UsersService : IUsersService
     }
 
     /// <summary>
-    /// Unscoped: callers have already checked the actor may see the user.
+    /// The only account here besides the admins is the SuperAdmin, who is the actor, so the
+    /// self check is what keeps it out of reach.
     /// </summary>
-    private async Task<Response<UserDetailsViewModel>> GetDetails(Guid id, CancellationToken cancellationToken)
-    {
-        var user = await this.usersRepository.GetQueryable()
-            .Include(a => a.Branch)
-            .Include(a => a.UserPermissions).ThenInclude(a => a.Permission)
-            .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
-
-        if (user == null)
-        {
-            return Response<UserDetailsViewModel>.NotFound(ResponseMessages.UserNotFound);
-        }
-
-        var access = await this.accessProvider.Get(id, cancellationToken);
-
-        return Response<UserDetailsViewModel>.Succeed(ViewModelFactory.CreateDetails(user, access, this.Now));
-    }
-
-    /// <summary>
-    /// Loads a user the actor may see and manage. Out of scope reads as not found; in scope but
-    /// above the actor in the hierarchy reads as forbidden.
-    /// </summary>
-    private async Task<(User? User, Response? Denied)> FindManageable(
+    private Task<(User? User, Response? Denied)> Find(
         Guid id,
         RequestUser actor,
         bool allowSelf,
         CancellationToken cancellationToken,
         bool includePermissions = false)
     {
-        var actorAccess = await this.accessGuard.GetActorAccess(actor, cancellationToken);
         var users = this.usersRepository.GetTrackedQueryable();
 
         if (includePermissions)
@@ -480,37 +239,6 @@ internal sealed class UsersService : IUsersService
             users = users.Include(a => a.UserPermissions).ThenInclude(a => a.Permission);
         }
 
-        var user = await AccessGuard.VisibleTo(users, actorAccess).FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
-
-        if (user == null)
-        {
-            return (null, Response.NotFound(ResponseMessages.UserNotFound));
-        }
-
-        if (user.Id == actor.Id)
-        {
-            return allowSelf ? (user, null) : (null, Response.Fail(ResponseMessages.CannotModifySelf));
-        }
-
-        return await this.accessGuard.CanManage(actorAccess, user, cancellationToken)
-            ? (user, null)
-            : (null, Response.Forbidden(ResponseMessages.CannotManageUser));
-    }
-
-    /// <summary>
-    /// Callers that end sessions have already rotated the user's security stamp; saving it is
-    /// what invalidates both access and refresh tokens. Marking the refresh tokens revoked
-    /// afterwards only keeps the RefreshTokens table truthful.
-    /// </summary>
-    private async Task SaveAndEndSessions(User user, bool endSessions, Action recordAudit, RequestUser actor, CancellationToken cancellationToken)
-    {
-        recordAudit();
-        await this.unitOfWork.SaveChanges(cancellationToken);
-        await this.accessProvider.Invalidate(user.Id, cancellationToken);
-
-        if (endSessions)
-        {
-            await this.refreshTokensRepository.RevokeAllActive(user.Id, this.Now, actor.IpAddress, AdminActionReason, cancellationToken);
-        }
+        return this.accounts.Find(AccessGuard.Users(users), id, actor, allowSelf, ResponseMessages.UserNotFound, cancellationToken);
     }
 }

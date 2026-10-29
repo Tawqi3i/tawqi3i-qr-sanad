@@ -9,13 +9,11 @@ using Tawqi3i.QrSanad.Common.Helpers;
 using Tawqi3i.QrSanad.Common.Identity;
 
 /// <summary>
-/// The hierarchy rules. [HasPermission] decides whether someone may manage users at all; this
-/// decides whom and how far:
-///  - the SuperAdmin sees and manages everyone except itself;
-///  - everyone else sees only their own branch and manages only its plain users;
-///  - a branch admin manages every user of the branch; a user who was delegated user
-///    management manages only users whose permissions they also hold;
-///  - nobody grants a permission they do not hold, and only admins may revoke one they do not hold.
+/// The scope rules. [HasPermission] and [SuperAdminOnly] decide whether someone may act at all;
+/// this decides on which records:
+///  - the SuperAdmin sees everything;
+///  - everyone else sees only their own branch;
+///  - a device sees only its own scans.
 /// </summary>
 internal sealed class AccessGuard
 {
@@ -33,18 +31,28 @@ internal sealed class AccessGuard
     }
 
     /// <summary>
-    /// Restricts a query to the users the actor may see. Users outside it are reported as not
-    /// found, so other branches' users cannot even be confirmed to exist.
+    /// The SuperAdmin and the admins: what /users lists. Reserved to the SuperAdmin.
     /// </summary>
-    public static IQueryable<User> VisibleTo(IQueryable<User> users, UserAccess actor)
+    public static IQueryable<User> Users(IQueryable<User> users)
     {
+        return users.Where(a => a.UserType != UserType.Device);
+    }
+
+    /// <summary>
+    /// Restricts a query to the devices the actor may see. Devices outside it are reported as not
+    /// found, so other branches' devices cannot even be confirmed to exist.
+    /// </summary>
+    public static IQueryable<User> DevicesVisibleTo(IQueryable<User> users, UserAccess actor)
+    {
+        var devices = users.Where(a => a.UserType == UserType.Device);
+
         if (actor.IsSuperAdmin)
         {
-            return users;
+            return devices;
         }
 
         var branchId = actor.BranchId;
-        return users.Where(a => a.BranchId == branchId && branchId != null && a.UserType != UserType.SuperAdmin);
+        return devices.Where(a => a.BranchId == branchId && branchId != null);
     }
 
     /// <summary>
@@ -64,7 +72,7 @@ internal sealed class AccessGuard
 
     /// <summary>
     /// Restricts a query to the QR scans the actor may see: the audit entries they may see when they
-    /// hold audit_logs.view, otherwise only their own scans.
+    /// hold audit_logs.view, otherwise only their own scans (none, unless they are a device).
     /// </summary>
     public static IQueryable<SecurityAuditLog> ScansVisibleTo(IQueryable<SecurityAuditLog> logs, UserAccess actor)
     {
@@ -76,42 +84,5 @@ internal sealed class AccessGuard
 
         var userId = actor.UserId;
         return scans.Where(a => a.UserId == userId);
-    }
-
-    public static bool CanGrant(UserAccess actor, IEnumerable<string> permissionCodes)
-    {
-        return actor.IsSuperAdmin || permissionCodes.All(actor.HasPermission);
-    }
-
-    public static bool CanChangePermissions(UserAccess actor, IEnumerable<string> added, IEnumerable<string> removed)
-    {
-        return actor.IsSuperAdmin
-            || (added.All(actor.HasPermission) && (actor.UserType == UserType.Admin || removed.All(actor.HasPermission)));
-    }
-
-    public async Task<bool> CanManage(UserAccess actor, User target, CancellationToken cancellationToken)
-    {
-        if (target.UserType == UserType.SuperAdmin)
-        {
-            return false;
-        }
-
-        if (actor.IsSuperAdmin)
-        {
-            return true;
-        }
-
-        if (target.BranchId != actor.BranchId || target.UserType != UserType.User)
-        {
-            return false;
-        }
-
-        if (actor.UserType == UserType.Admin)
-        {
-            return true;
-        }
-
-        var targetAccess = await this.accessProvider.Get(target.Id, cancellationToken);
-        return targetAccess == null || CanGrant(actor, targetAccess.Permissions);
     }
 }

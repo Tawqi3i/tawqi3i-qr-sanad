@@ -21,7 +21,7 @@ public class BranchViewModel
     /// </summary>
     public UserSummaryViewModel? Admin { get; set; }
 
-    public int UsersCount { get; set; }
+    public int DevicesCount { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

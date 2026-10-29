@@ -27,7 +27,7 @@ internal static class ViewModelFactory
         return model;
     }
 
-    public static BranchViewModel Create(Branch branch, User? admin, int usersCount)
+    public static BranchViewModel Create(Branch branch, User? admin, int devicesCount)
     {
         return new BranchViewModel
         {
@@ -46,7 +46,7 @@ internal static class ViewModelFactory
                     DisplayName = admin.DisplayName,
                     Status = admin.Status
                 },
-            UsersCount = usersCount,
+            DevicesCount = devicesCount,
             CreatedAt = branch.CreatedAt,
             UpdatedAt = branch.UpdatedAt
         };

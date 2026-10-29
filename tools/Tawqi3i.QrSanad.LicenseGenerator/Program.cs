@@ -16,8 +16,9 @@ var license = new LicenseData
     Type = "TRIAL",                                    // TRIAL, PROD or DEV
     IssuedAt = DateTime.UtcNow,
     ExpiresAt = DateTime.UtcNow.Date.AddDays(5),
-    MaxUsers = 50,                                     // null = unlimited (the SuperAdmin is not counted)
-    MaxBranches = 50                                    // null = unlimited
+    MaxUsers = 2,                                     // admins; null = unlimited (the SuperAdmin is not counted)
+    MaxDevices = 2,                                   // null = unlimited
+    MaxBranches = 2                                   // null = unlimited
 };
 
 // ==========================================================================================
@@ -31,7 +32,7 @@ const string Usage = """
           LicensePublicKey.cs. A new pair invalidates every license issued with the old one.
 
       issue --private-key <file> --customer <name> --type <TRIAL|PROD|DEV>
-            (--days <n> | --expires <yyyy-MM-dd>) [--max-users <n>] [--max-branches <n>]
+            (--days <n> | --expires <yyyy-MM-dd>) [--max-users <n>] [--max-devices <n>] [--max-branches <n>]
           Prints a signed license key for Licensing:Key or PUT /api/v1/license.
 
       verify <license-key>
@@ -94,6 +95,7 @@ static int IssueFromOptions(Dictionary<string, string> options)
             ? DateTime.SpecifyKind(DateTime.ParseExact(expires, "yyyy-MM-dd", CultureInfo.InvariantCulture), DateTimeKind.Utc)
             : now.Date.AddDays(int.Parse(Required(options, "days"), CultureInfo.InvariantCulture)),
         MaxUsers = OptionalInt(options, "max-users"),
+        MaxDevices = OptionalInt(options, "max-devices"),
         MaxBranches = OptionalInt(options, "max-branches")
     };
 

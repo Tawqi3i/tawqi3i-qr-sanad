@@ -1,11 +1,9 @@
 namespace Tawqi3i.QrSanad.Common.Dto.V1.Requests.Users;
 
 using System.ComponentModel.DataAnnotations;
-using Tawqi3i.QrSanad.Common.Enums;
 
 /// <summary>
-/// The SuperAdmin creates admins and users for any branch (BranchId required). An admin creates
-/// users in their own branch only: Type must be User and BranchId may be omitted.
+/// The SuperAdmin creates the admin of a branch. Devices are created through DeviceCreateRequest.
 /// </summary>
 public class UserCreateRequest
 {
@@ -30,12 +28,7 @@ public class UserCreateRequest
     [StringLength(128, ErrorMessage = "The {0} field must not exceed {1} characters")]
     public string Password { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Admin or User. Defaults to User.
-    /// </summary>
-    [EnumDataType(typeof(UserType), ErrorMessage = "The {0} field is invalid")]
-    public UserType Type { get; set; } = UserType.User;
-
+    [Required(ErrorMessage = "The {0} field is required")]
     public Guid? BranchId { get; set; }
 
     /// <summary>
@@ -44,8 +37,7 @@ public class UserCreateRequest
     public bool MustChangePassword { get; set; } = true;
 
     /// <summary>
-    /// Permission codes to grant. When creating an admin and this is left empty, the admin gets
-    /// every permission.
+    /// Permission codes to grant. Left empty, the admin gets every permission.
     /// </summary>
     [MaxLength(200, ErrorMessage = "The {0} field must not contain more than {1} items")]
     public ICollection<string> Permissions { get; set; } = [];

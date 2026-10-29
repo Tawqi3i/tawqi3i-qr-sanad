@@ -4,16 +4,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Tawqi3i.QrSanad.Persistence.Sql.Providers;
 
 #nullable disable
 
-namespace Tawqi3i.QrSanad.Persistence.Migrations.PostgreSql
+namespace Tawqi3i.QrSanad.Persistence.Migrations.MySql
 {
-    [DbContext(typeof(PostgreSqlQrSanadContext))]
-    [Migration("20261024123813_AddLicense")]
-    partial class AddLicense
+    [DbContext(typeof(MySqlQrSanadContext))]
+    [Migration("20261029075725_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,86 +20,84 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.PostgreSql
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "10.0.13")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
-
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Tawqi3i.QrSanad.Common.Domain.Models.V1.Branch", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("id");
 
                     b.Property<string>("Address")
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
+                        .HasColumnType("varchar(256)")
                         .HasColumnName("address");
 
                     b.Property<Guid?>("AdminUserId")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("admin_user_id");
 
                     b.Property<string>("Code")
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
+                        .HasColumnType("varchar(32)")
                         .HasColumnName("code");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("varchar(64)")
                         .HasColumnName("concurrency_stamp");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
                     b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("created_by");
 
                     b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("deleted_at");
 
                     b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("deleted_by");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
+                        .HasColumnType("tinyint(1)")
                         .HasColumnName("is_deleted");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
+                        .HasColumnType("varchar(128)")
                         .HasColumnName("name");
 
                     b.Property<string>("NormalizedName")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
+                        .HasColumnType("varchar(128)")
                         .HasColumnName("normalized_name");
 
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
+                        .HasColumnType("varchar(32)")
                         .HasColumnName("phone_number");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
+                        .HasColumnType("varchar(32)")
                         .HasColumnName("status");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
 
                     b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("updated_by");
 
                     b.HasKey("Id")
@@ -124,29 +121,29 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.PostgreSql
             modelBuilder.Entity("Tawqi3i.QrSanad.Common.Domain.Models.V1.License", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
                     b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("created_by");
 
                     b.Property<string>("Key")
                         .IsRequired()
                         .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
+                        .HasColumnType("varchar(2000)")
                         .HasColumnName("key");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
 
                     b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("updated_by");
 
                     b.HasKey("Id")
@@ -158,47 +155,47 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.PostgreSql
             modelBuilder.Entity("Tawqi3i.QrSanad.Common.Domain.Models.V1.PasswordPolicy", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
                     b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("created_by");
 
                     b.Property<int>("MaxLength")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("max_length");
 
                     b.Property<int>("MinLength")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("min_length");
 
                     b.Property<bool>("RequireDigit")
-                        .HasColumnType("boolean")
+                        .HasColumnType("tinyint(1)")
                         .HasColumnName("require_digit");
 
                     b.Property<bool>("RequireLowercase")
-                        .HasColumnType("boolean")
+                        .HasColumnType("tinyint(1)")
                         .HasColumnName("require_lowercase");
 
                     b.Property<bool>("RequireNonAlphanumeric")
-                        .HasColumnType("boolean")
+                        .HasColumnType("tinyint(1)")
                         .HasColumnName("require_non_alphanumeric");
 
                     b.Property<bool>("RequireUppercase")
-                        .HasColumnType("boolean")
+                        .HasColumnType("tinyint(1)")
                         .HasColumnName("require_uppercase");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
 
                     b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("updated_by");
 
                     b.HasKey("Id")
@@ -210,19 +207,19 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.PostgreSql
             modelBuilder.Entity("Tawqi3i.QrSanad.Common.Domain.Models.V1.Permission", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("id");
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
+                        .HasColumnType("varchar(128)")
                         .HasColumnName("code");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
+                        .HasColumnType("varchar(256)")
                         .HasColumnName("description");
 
                     b.HasKey("Id")
@@ -237,116 +234,98 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.PostgreSql
                     b.HasData(
                         new
                         {
-                            Id = new Guid("faebb80f-3f91-88d3-8344-93229a4b7798"),
-                            Code = "users.view",
-                            Description = "View the users of the branch"
+                            Id = new Guid("920cd118-9c00-8f37-812b-fbd85f57d583"),
+                            Code = "devices.view",
+                            Description = "View the devices of the branch"
                         },
                         new
                         {
-                            Id = new Guid("a1885bbe-d02b-8363-bf99-25e9c4bad98d"),
-                            Code = "users.create",
-                            Description = "Create users in the branch"
+                            Id = new Guid("e5a41f90-777a-8164-879a-e3f813a4a800"),
+                            Code = "devices.create",
+                            Description = "Create devices in the branch"
                         },
                         new
                         {
-                            Id = new Guid("6b5dd7de-fed2-8a5b-8064-b4d9a2551f9d"),
-                            Code = "users.update",
-                            Description = "Update users, change their status and unlock them"
+                            Id = new Guid("fd38ee72-0175-8469-adb1-7daa12eb082e"),
+                            Code = "devices.update",
+                            Description = "Update devices, change their status and unlock them"
                         },
                         new
                         {
-                            Id = new Guid("b5b3840b-f1b5-8912-909e-80df84a42698"),
-                            Code = "users.delete",
-                            Description = "Delete users"
+                            Id = new Guid("10783350-fd27-8bdf-b482-312e51368dd5"),
+                            Code = "devices.delete",
+                            Description = "Delete devices"
                         },
                         new
                         {
-                            Id = new Guid("935d225d-1b6c-830d-916b-c94acbf35197"),
-                            Code = "users.reset_password",
-                            Description = "Reset another user's password"
-                        },
-                        new
-                        {
-                            Id = new Guid("9b5270e0-5623-8d12-bf45-ae8cd430b855"),
-                            Code = "users.assign_permissions",
-                            Description = "Grant and revoke user permissions"
-                        },
-                        new
-                        {
-                            Id = new Guid("c7994376-f8e1-8e70-a2f6-5de3a6ea4963"),
-                            Code = "permissions.view",
-                            Description = "View the permission catalogue"
+                            Id = new Guid("bae32de5-08ae-8c8a-becf-90af0e3cff7e"),
+                            Code = "devices.reset_password",
+                            Description = "Reset a device's password"
                         },
                         new
                         {
                             Id = new Guid("f969d5a8-1f29-8efb-b321-4e7cc4654082"),
                             Code = "audit_logs.view",
-                            Description = "View the security audit log of the branch"
-                        },
-                        new
-                        {
-                            Id = new Guid("8ac78524-d7b8-861f-9978-2a67584e06a8"),
-                            Code = "eseal.view",
-                            Description = "Retrieve e-sealed documents by SANAD QR code"
+                            Description = "View the security audit log and the scans of the branch"
                         });
                 });
 
             modelBuilder.Entity("Tawqi3i.QrSanad.Common.Domain.Models.V1.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
                     b.Property<string>("CreatedByIp")
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("varchar(64)")
                         .HasColumnName("created_by_ip");
 
                     b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("expires_at");
 
                     b.Property<Guid?>("ReplacedByTokenId")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("replaced_by_token_id");
 
                     b.Property<string>("RevokeReason")
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("varchar(64)")
                         .HasColumnName("revoke_reason");
 
                     b.Property<DateTime?>("RevokedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("revoked_at");
 
                     b.Property<string>("RevokedByIp")
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("varchar(64)")
                         .HasColumnName("revoked_by_ip");
 
                     b.Property<string>("SecurityStamp")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("varchar(64)")
                         .HasColumnName("security_stamp");
 
                     b.Property<string>("TokenHash")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
+                        .HasColumnType("varchar(128)")
                         .HasColumnName("token_hash");
 
                     b.Property<string>("UserAgent")
                         .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
+                        .HasColumnType("varchar(512)")
                         .HasColumnName("user_agent");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
@@ -365,49 +344,49 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.PostgreSql
             modelBuilder.Entity("Tawqi3i.QrSanad.Common.Domain.Models.V1.SecurityAuditLog", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("id");
 
                     b.Property<Guid?>("ActorId")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("actor_id");
 
                     b.Property<Guid?>("BranchId")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("branch_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
                     b.Property<string>("Details")
                         .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
+                        .HasColumnType("varchar(2000)")
                         .HasColumnName("details");
 
                     b.Property<string>("EventType")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("varchar(64)")
                         .HasColumnName("event_type");
 
                     b.Property<string>("IpAddress")
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("varchar(64)")
                         .HasColumnName("ip_address");
 
                     b.Property<string>("UserAgent")
                         .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
+                        .HasColumnType("varchar(512)")
                         .HasColumnName("user_agent");
 
                     b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("user_id");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
+                        .HasColumnType("varchar(256)")
                         .HasColumnName("user_name");
 
                     b.HasKey("Id")
@@ -428,125 +407,123 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.PostgreSql
             modelBuilder.Entity("Tawqi3i.QrSanad.Common.Domain.Models.V1.User", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("id");
 
                     b.Property<int>("AccessFailedCount")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("access_failed_count");
 
                     b.Property<Guid?>("BranchId")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("branch_id");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("varchar(64)")
                         .HasColumnName("concurrency_stamp");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
                     b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("created_by");
 
                     b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("deleted_at");
 
                     b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("deleted_by");
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
+                        .HasColumnType("varchar(128)")
                         .HasColumnName("display_name");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
+                        .HasColumnType("varchar(256)")
                         .HasColumnName("email");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
+                        .HasColumnType("tinyint(1)")
                         .HasColumnName("is_deleted");
 
                     b.Property<DateTime?>("LastLoginAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("last_login_at");
 
                     b.Property<DateTime?>("LockoutEnd")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("lockout_end");
 
                     b.Property<bool>("MustChangePassword")
-                        .HasColumnType("boolean")
+                        .HasColumnType("tinyint(1)")
                         .HasColumnName("must_change_password");
 
                     b.Property<string>("NormalizedEmail")
-                        .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
+                        .HasColumnType("varchar(256)")
                         .HasColumnName("normalized_email");
 
                     b.Property<string>("NormalizedUserName")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("varchar(64)")
                         .HasColumnName("normalized_user_name");
 
                     b.Property<DateTime?>("PasswordChangedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("password_changed_at");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
+                        .HasColumnType("varchar(512)")
                         .HasColumnName("password_hash");
 
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
+                        .HasColumnType("varchar(32)")
                         .HasColumnName("phone_number");
 
                     b.Property<string>("SecurityStamp")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("varchar(64)")
                         .HasColumnName("security_stamp");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
+                        .HasColumnType("varchar(32)")
                         .HasColumnName("status");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
 
                     b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("updated_by");
 
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("varchar(64)")
                         .HasColumnName("user_name");
 
                     b.Property<string>("UserType")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
+                        .HasColumnType("varchar(32)")
                         .HasColumnName("user_type");
 
                     b.HasKey("Id")
@@ -572,19 +549,19 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.PostgreSql
             modelBuilder.Entity("Tawqi3i.QrSanad.Common.Domain.Models.V1.UserPermission", b =>
                 {
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("user_id");
 
                     b.Property<Guid>("PermissionId")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("permission_id");
 
                     b.Property<DateTime>("AssignedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("assigned_at");
 
                     b.Property<Guid?>("AssignedBy")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("assigned_by");
 
                     b.HasKey("UserId", "PermissionId")
@@ -617,6 +594,85 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.PostgreSql
                         .HasConstraintName("fk_refresh_tokens_users_user_id");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Tawqi3i.QrSanad.Common.Domain.Models.V1.SecurityAuditLog", b =>
+                {
+                    b.OwnsOne("Tawqi3i.QrSanad.Common.Domain.Models.V1.IdentityCard", "IdentityCard", b1 =>
+                        {
+                            b1.Property<Guid>("SecurityAuditLogId")
+                                .HasColumnType("char(36)")
+                                .HasColumnName("id");
+
+                            b1.Property<string>("ArabicName")
+                                .IsRequired()
+                                .HasMaxLength(256)
+                                .HasColumnType("varchar(256)")
+                                .HasColumnName("identity_card_arabic_name");
+
+                            b1.Property<DateOnly?>("BirthDate")
+                                .HasColumnType("date")
+                                .HasColumnName("identity_card_birth_date");
+
+                            b1.Property<string>("BloodType")
+                                .HasMaxLength(8)
+                                .HasColumnType("varchar(8)")
+                                .HasColumnName("identity_card_blood_type");
+
+                            b1.Property<string>("CardNumber")
+                                .HasMaxLength(32)
+                                .HasColumnType("varchar(32)")
+                                .HasColumnName("identity_card_card_number");
+
+                            b1.Property<string>("EnglishName")
+                                .IsRequired()
+                                .HasMaxLength(256)
+                                .HasColumnType("varchar(256)")
+                                .HasColumnName("identity_card_english_name");
+
+                            b1.Property<DateOnly?>("ExpiryDate")
+                                .HasColumnType("date")
+                                .HasColumnName("identity_card_expiry_date");
+
+                            b1.Property<string>("Gender")
+                                .HasMaxLength(32)
+                                .HasColumnType("varchar(32)")
+                                .HasColumnName("identity_card_gender");
+
+                            b1.Property<string>("MotherName")
+                                .HasMaxLength(256)
+                                .HasColumnType("varchar(256)")
+                                .HasColumnName("identity_card_mother_name");
+
+                            b1.Property<string>("NationalNumber")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("varchar(10)")
+                                .HasColumnName("identity_card_national_number");
+
+                            b1.Property<string>("RegistryNumber")
+                                .HasMaxLength(32)
+                                .HasColumnType("varchar(32)")
+                                .HasColumnName("identity_card_registry_number");
+
+                            b1.Property<string>("Residence")
+                                .HasMaxLength(256)
+                                .HasColumnType("varchar(256)")
+                                .HasColumnName("identity_card_residence");
+
+                            b1.HasKey("SecurityAuditLogId");
+
+                            b1.HasIndex("NationalNumber")
+                                .HasDatabaseName("ix_security_audit_logs_identity_card_national_number");
+
+                            b1.ToTable("security_audit_logs");
+
+                            b1.WithOwner()
+                                .HasForeignKey("SecurityAuditLogId")
+                                .HasConstraintName("fk_security_audit_logs_security_audit_logs_id");
+                        });
+
+                    b.Navigation("IdentityCard");
                 });
 
             modelBuilder.Entity("Tawqi3i.QrSanad.Common.Domain.Models.V1.User", b =>

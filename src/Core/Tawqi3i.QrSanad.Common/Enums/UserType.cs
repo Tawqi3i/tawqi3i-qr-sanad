@@ -1,7 +1,7 @@
 namespace Tawqi3i.QrSanad.Common.Enums;
 
 /// <summary>
-/// The fixed hierarchy. Who may manage whom is decided by the type; what a user may do beyond
+/// The fixed hierarchy. Who may manage whom is decided by the type; what an admin may do beyond
 /// that is decided by their permissions.
 /// </summary>
 public enum UserType
@@ -13,12 +13,12 @@ public enum UserType
     SuperAdmin = 1,
 
     /// <summary>
-    /// Runs one branch: creates and manages that branch's users.
+    /// Runs one branch: manages that branch's devices, within the permissions the SuperAdmin granted.
     /// </summary>
     Admin = 2,
 
     /// <summary>
-    /// A member of one branch, with the permissions their admin granted.
+    /// A scanning station of one branch. The only type that can scan; holds no permissions.
     /// </summary>
-    User = 3,
+    Device = 3,
 }

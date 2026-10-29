@@ -3,6 +3,7 @@ namespace Tawqi3i.QrSanad.Domain.Factories;
 using Tawqi3i.QrSanad.Common.Domain.Models.V1;
 using Tawqi3i.QrSanad.Common.Dto.V1.Requests.Auth;
 using Tawqi3i.QrSanad.Common.Dto.V1.Requests.Branches;
+using Tawqi3i.QrSanad.Common.Dto.V1.Requests.Devices;
 using Tawqi3i.QrSanad.Common.Dto.V1.Requests.Users;
 using Tawqi3i.QrSanad.Common.Enums;
 using Tawqi3i.QrSanad.Common.Helpers;
@@ -11,34 +12,25 @@ using Tawqi3i.QrSanad.Common.ViewModels.V1;
 
 internal static class DomainModelFactory
 {
-    public static User CreateUser(UserCreateRequest request, string passwordHash, Guid branchId, IEnumerable<Permission> permissions, Guid actorId, DateTime now)
+    public static User CreateAdmin(UserCreateRequest request, Guid branchId, string passwordHash, IEnumerable<Permission> permissions, Guid actorId, DateTime now)
     {
-        var userId = Generator.CreateV7Guid();
-        var userName = request.UserName.Trim();
+        var admin = CreateAccount(UserType.Admin, request.UserName, request.DisplayName, branchId, passwordHash, actorId, now);
         var email = request.Email.Trim();
 
-        return new User
-        {
-            Id = userId,
-            UserName = userName,
-            NormalizedUserName = Normalizer.Normalize(userName),
-            Email = email,
-            NormalizedEmail = Normalizer.Normalize(email),
-            DisplayName = request.DisplayName.Trim(),
-            PhoneNumber = NullIfBlank(request.PhoneNumber),
-            UserType = request.Type,
-            BranchId = branchId,
-            PasswordHash = passwordHash,
-            SecurityStamp = Generator.NewStamp(),
-            ConcurrencyStamp = Generator.NewStamp(),
-            Status = UserStatus.Active,
-            MustChangePassword = request.MustChangePassword,
-            PasswordChangedAt = now,
-            CreatedBy = actorId,
-            UserPermissions = permissions
-                .Select(a => new UserPermission { UserId = userId, PermissionId = a.Id, AssignedAt = now, AssignedBy = actorId })
-                .ToList()
-        };
+        admin.Email = email;
+        admin.NormalizedEmail = Normalizer.Normalize(email);
+        admin.PhoneNumber = NullIfBlank(request.PhoneNumber);
+        admin.MustChangePassword = request.MustChangePassword;
+        admin.UserPermissions = permissions
+            .Select(a => new UserPermission { UserId = admin.Id, PermissionId = a.Id, AssignedAt = now, AssignedBy = actorId })
+            .ToList();
+
+        return admin;
+    }
+
+    public static User CreateDevice(DeviceCreateRequest request, Guid branchId, string passwordHash, Guid actorId, DateTime now)
+    {
+        return CreateAccount(UserType.Device, request.UserName, request.DisplayName, branchId, passwordHash, actorId, now);
     }
 
     public static Branch CreateBranch(BranchRequest request, Guid actorId)
@@ -91,4 +83,25 @@ internal static class DomainModelFactory
     }
 
     public static string? NullIfBlank(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+    private static User CreateAccount(UserType type, string userName, string displayName, Guid branchId, string passwordHash, Guid actorId, DateTime now)
+    {
+        userName = userName.Trim();
+
+        return new User
+        {
+            Id = Generator.CreateV7Guid(),
+            UserName = userName,
+            NormalizedUserName = Normalizer.Normalize(userName),
+            DisplayName = displayName.Trim(),
+            UserType = type,
+            BranchId = branchId,
+            PasswordHash = passwordHash,
+            SecurityStamp = Generator.NewStamp(),
+            ConcurrencyStamp = Generator.NewStamp(),
+            Status = UserStatus.Active,
+            PasswordChangedAt = now,
+            CreatedBy = actorId
+        };
+    }
 }

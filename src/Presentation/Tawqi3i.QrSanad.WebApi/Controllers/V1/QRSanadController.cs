@@ -13,8 +13,7 @@ using Tawqi3i.QrSanad.WebApi.Common;
 
 /// <summary>
 /// SANAD QR documents, fetched directly from the MoDEE e-seal service, and their scan
-/// statistics. The permission keeps its original code, eseal.view: its id is derived from the
-/// code, so renaming it would drop every existing grant.
+/// statistics. Only devices scan.
 /// </summary>
 [Route("api/v1/qr-sanad")]
 [ApiController]
@@ -42,7 +41,7 @@ public class QRSanadController : ControllerBase
     /// The MoDEE e-sealed document (base64 PAdES-T PDF) for a SANAD digital document QR code.
     /// Every scan is written to the audit log as qrScanSucceeded or qrScanFailed.
     /// </summary>
-    [HttpPost("sealed-doc"), HasPermission(PermissionCodes.ESeal.View)]
+    [HttpPost("sealed-doc"), DeviceOnly]
     [ProducesResponseType(typeof(Response<SealedDocViewModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status403Forbidden)]
@@ -56,13 +55,12 @@ public class QRSanadController : ControllerBase
 
     /// <summary>
     /// The QR scans, newest first, with the identity card holder when there was one: all of them
-    /// for the SuperAdmin, the branch's for whoever holds audit_logs.view, otherwise the caller's
-    /// own. Search by national number or name.
+    /// for the SuperAdmin, the branch's for an admin holding audit_logs.view, and a device's own
+    /// for a device. Search by national number or name.
     /// </summary>
-    [HttpGet("scans"), HasPermission(PermissionCodes.ESeal.View)]
+    [HttpGet("scans")]
     [ProducesResponseType(typeof(PagedResponse<SecurityAuditLogViewModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(Response), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetScans([FromQuery] ScansQuery query, CancellationToken cancellationToken)
     {
         var result = await this.auditLogsService.GetScans(query, this.HttpContext.ExtractUser(), cancellationToken);
@@ -71,7 +69,7 @@ public class QRSanadController : ControllerBase
     }
 
     /// <summary>
-    /// QR scan statistics for the dashboard: totals, per day, top users and, for the SuperAdmin,
+    /// QR scan statistics for the dashboard: totals, per day, top devices and, for the SuperAdmin,
     /// per branch. Defaults to the last 30 days; at most 92. Admins see their own branch only.
     /// </summary>
     [HttpGet("stats"), HasPermission(PermissionCodes.AuditLogs.View)]

@@ -14,6 +14,43 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.Oracle
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "LICENSES",
+                columns: table => new
+                {
+                    ID = table.Column<Guid>(type: "RAW(16)", nullable: false),
+                    KEY = table.Column<string>(type: "NVARCHAR2(2000)", maxLength: 2000, nullable: false),
+                    CREATED_AT = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
+                    CREATED_BY = table.Column<Guid>(type: "RAW(16)", nullable: true),
+                    UPDATED_AT = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: true),
+                    UPDATED_BY = table.Column<Guid>(type: "RAW(16)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LICENSES", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PASSWORD_POLICIES",
+                columns: table => new
+                {
+                    ID = table.Column<Guid>(type: "RAW(16)", nullable: false),
+                    MIN_LENGTH = table.Column<int>(type: "NUMBER(10)", nullable: false),
+                    MAX_LENGTH = table.Column<int>(type: "NUMBER(10)", nullable: false),
+                    REQUIRE_UPPERCASE = table.Column<bool>(type: "BOOLEAN", nullable: false),
+                    REQUIRE_LOWERCASE = table.Column<bool>(type: "BOOLEAN", nullable: false),
+                    REQUIRE_DIGIT = table.Column<bool>(type: "BOOLEAN", nullable: false),
+                    REQUIRE_NON_ALPHANUMERIC = table.Column<bool>(type: "BOOLEAN", nullable: false),
+                    CREATED_AT = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
+                    CREATED_BY = table.Column<Guid>(type: "RAW(16)", nullable: true),
+                    UPDATED_AT = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: true),
+                    UPDATED_BY = table.Column<Guid>(type: "RAW(16)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PASSWORD_POLICIES", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PERMISSIONS",
                 columns: table => new
                 {
@@ -39,6 +76,17 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.Oracle
                     IP_ADDRESS = table.Column<string>(type: "NVARCHAR2(64)", maxLength: 64, nullable: true),
                     USER_AGENT = table.Column<string>(type: "NVARCHAR2(512)", maxLength: 512, nullable: true),
                     DETAILS = table.Column<string>(type: "NVARCHAR2(2000)", maxLength: 2000, nullable: true),
+                    IDENTITY_CARD_NATIONAL_NUMBER = table.Column<string>(type: "NVARCHAR2(10)", maxLength: 10, nullable: true),
+                    IDENTITY_CARD_ARABIC_NAME = table.Column<string>(type: "NVARCHAR2(256)", maxLength: 256, nullable: true),
+                    IDENTITY_CARD_ENGLISH_NAME = table.Column<string>(type: "NVARCHAR2(256)", maxLength: 256, nullable: true),
+                    IDENTITY_CARD_GENDER = table.Column<string>(type: "NVARCHAR2(32)", maxLength: 32, nullable: true),
+                    IDENTITY_CARD_BLOOD_TYPE = table.Column<string>(type: "NVARCHAR2(8)", maxLength: 8, nullable: true),
+                    IDENTITY_CARD_BIRTH_DATE = table.Column<string>(type: "NVARCHAR2(10)", nullable: true),
+                    IDENTITY_CARD_MOTHER_NAME = table.Column<string>(type: "NVARCHAR2(256)", maxLength: 256, nullable: true),
+                    IDENTITY_CARD_REGISTRY_NUMBER = table.Column<string>(type: "NVARCHAR2(32)", maxLength: 32, nullable: true),
+                    IDENTITY_CARD_EXPIRY_DATE = table.Column<string>(type: "NVARCHAR2(10)", nullable: true),
+                    IDENTITY_CARD_RESIDENCE = table.Column<string>(type: "NVARCHAR2(256)", maxLength: 256, nullable: true),
+                    IDENTITY_CARD_CARD_NUMBER = table.Column<string>(type: "NVARCHAR2(32)", maxLength: 32, nullable: true),
                     CREATED_AT = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false)
                 },
                 constraints: table =>
@@ -79,8 +127,8 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.Oracle
                     ID = table.Column<Guid>(type: "RAW(16)", nullable: false),
                     USER_NAME = table.Column<string>(type: "NVARCHAR2(64)", maxLength: 64, nullable: false),
                     NORMALIZED_USER_NAME = table.Column<string>(type: "NVARCHAR2(64)", maxLength: 64, nullable: false),
-                    EMAIL = table.Column<string>(type: "NVARCHAR2(256)", maxLength: 256, nullable: false),
-                    NORMALIZED_EMAIL = table.Column<string>(type: "NVARCHAR2(256)", maxLength: 256, nullable: false),
+                    EMAIL = table.Column<string>(type: "NVARCHAR2(256)", maxLength: 256, nullable: true),
+                    NORMALIZED_EMAIL = table.Column<string>(type: "NVARCHAR2(256)", maxLength: 256, nullable: true),
                     DISPLAY_NAME = table.Column<string>(type: "NVARCHAR2(128)", maxLength: 128, nullable: false),
                     PHONE_NUMBER = table.Column<string>(type: "NVARCHAR2(32)", maxLength: 32, nullable: true),
                     USER_TYPE = table.Column<string>(type: "NVARCHAR2(32)", maxLength: 32, nullable: false),
@@ -172,14 +220,12 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.Oracle
                 columns: new[] { "ID", "CODE", "DESCRIPTION" },
                 values: new object[,]
                 {
-                    { new Guid("6b5dd7de-fed2-8a5b-8064-b4d9a2551f9d"), "users.update", "Update users, change their status and unlock them" },
-                    { new Guid("935d225d-1b6c-830d-916b-c94acbf35197"), "users.reset_password", "Reset another user's password" },
-                    { new Guid("9b5270e0-5623-8d12-bf45-ae8cd430b855"), "users.assign_permissions", "Grant and revoke user permissions" },
-                    { new Guid("a1885bbe-d02b-8363-bf99-25e9c4bad98d"), "users.create", "Create users in the branch" },
-                    { new Guid("b5b3840b-f1b5-8912-909e-80df84a42698"), "users.delete", "Delete users" },
-                    { new Guid("c7994376-f8e1-8e70-a2f6-5de3a6ea4963"), "permissions.view", "View the permission catalogue" },
-                    { new Guid("f969d5a8-1f29-8efb-b321-4e7cc4654082"), "audit_logs.view", "View the security audit log of the branch" },
-                    { new Guid("faebb80f-3f91-88d3-8344-93229a4b7798"), "users.view", "View the users of the branch" }
+                    { new Guid("10783350-fd27-8bdf-b482-312e51368dd5"), "devices.delete", "Delete devices" },
+                    { new Guid("920cd118-9c00-8f37-812b-fbd85f57d583"), "devices.view", "View the devices of the branch" },
+                    { new Guid("bae32de5-08ae-8c8a-becf-90af0e3cff7e"), "devices.reset_password", "Reset a device's password" },
+                    { new Guid("e5a41f90-777a-8164-879a-e3f813a4a800"), "devices.create", "Create devices in the branch" },
+                    { new Guid("f969d5a8-1f29-8efb-b321-4e7cc4654082"), "audit_logs.view", "View the security audit log and the scans of the branch" },
+                    { new Guid("fd38ee72-0175-8469-adb1-7daa12eb082e"), "devices.update", "Update devices, change their status and unlock them" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -230,6 +276,11 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.Oracle
                 column: "CREATED_AT");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SECURITY_AUDIT_LOGS_IDENTITY_CARD_NATIONAL_NUMBER",
+                table: "SECURITY_AUDIT_LOGS",
+                column: "IDENTITY_CARD_NATIONAL_NUMBER");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SECURITY_AUDIT_LOGS_USER_ID_CREATED_AT",
                 table: "SECURITY_AUDIT_LOGS",
                 columns: new[] { "USER_ID", "CREATED_AT" });
@@ -253,7 +304,8 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.Oracle
                 name: "IX_USERS_NORMALIZED_EMAIL",
                 table: "USERS",
                 column: "NORMALIZED_EMAIL",
-                unique: true);
+                unique: true,
+                filter: "\"NORMALIZED_EMAIL\" IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_USERS_NORMALIZED_USER_NAME",
@@ -276,6 +328,12 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.Oracle
             migrationBuilder.DropForeignKey(
                 name: "FK_BRANCHES_USERS_ADMIN_USER_ID",
                 table: "BRANCHES");
+
+            migrationBuilder.DropTable(
+                name: "LICENSES");
+
+            migrationBuilder.DropTable(
+                name: "PASSWORD_POLICIES");
 
             migrationBuilder.DropTable(
                 name: "REFRESH_TOKENS");
