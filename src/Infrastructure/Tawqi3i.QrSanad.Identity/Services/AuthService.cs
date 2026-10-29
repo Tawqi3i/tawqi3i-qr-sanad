@@ -25,6 +25,7 @@ internal sealed class AuthService : IAuthService
     private const string PasswordChangedReason = "password_changed";
     private const string ReuseDetectedReason = "reuse_detected";
     private const string UserInactiveReason = "user_inactive";
+    private const string NewLoginReason = "new_login";
 
     private readonly IUsersRepository usersRepository;
     private readonly IRefreshTokensRepository refreshTokensRepository;
@@ -109,6 +110,10 @@ internal sealed class AuthService : IAuthService
         var upgradedHash = check == PasswordCheck.SuccessRehashNeeded ? this.passwordService.Hash(request.Password) : null;
         TokenResponse? tokens = null;
 
+        // One session per user: a new login ends every other session. The new stamp invalidates
+        // access tokens already issued, and their refresh tokens are revoked below.
+        user.SecurityStamp = Generator.NewStamp();
+
         await this.unitOfWork.ExecuteInTransaction(
             async token =>
             {
@@ -119,7 +124,8 @@ internal sealed class AuthService : IAuthService
                         setters
                             .SetProperty(a => a.AccessFailedCount, 0)
                             .SetProperty(a => a.LockoutEnd, (DateTime?)null)
-                            .SetProperty(a => a.LastLoginAt, now);
+                            .SetProperty(a => a.LastLoginAt, now)
+                            .SetProperty(a => a.SecurityStamp, user.SecurityStamp);
 
                         if (upgradedHash != null)
                         {
@@ -128,11 +134,16 @@ internal sealed class AuthService : IAuthService
                     },
                     token);
 
+                await this.refreshTokensRepository.RevokeAllActive(user.Id, now, client.IpAddress, NewLoginReason, token);
+
                 tokens = this.IssueTokens(user, client, now, Generator.CreateV7Guid());
                 this.auditService.Record(SecurityEventType.LoginSucceeded, client, user.Id, user.UserName, branchId: user.BranchId);
                 await this.unitOfWork.SaveChanges(token);
             },
             cancellationToken);
+
+        // The cached access still holds the old stamp; drop it so old access tokens fail now.
+        await this.accessProvider.Invalidate(user.Id, cancellationToken);
 
         return Response<TokenResponse>.Succeed(tokens!);
     }

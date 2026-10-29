@@ -15,9 +15,9 @@ var license = new LicenseData
     Customer = "Customer name",
     Type = "TRIAL",                                    // TRIAL, PROD or DEV
     IssuedAt = DateTime.UtcNow,
-    ExpiresAt = DateTime.UtcNow.Date.AddDays(1),
-    MaxUsers = 200,                                     // null = unlimited (the SuperAdmin is not counted)
-    MaxBranches = 7                                    // null = unlimited
+    ExpiresAt = DateTime.UtcNow.Date.AddDays(5),
+    MaxUsers = 50,                                     // null = unlimited (the SuperAdmin is not counted)
+    MaxBranches = 50                                    // null = unlimited
 };
 
 // ==========================================================================================
