@@ -7,7 +7,9 @@ using Tawqi3i.QrSanad.Common.ViewModels.V1;
 
 /// <summary>
 /// The installed license and the limits it sets. The Ensure methods return the failure to send,
-/// or null when the operation is allowed.
+/// or null when the operation is allowed. The EnsureCanAdd methods also stage a claim on the
+/// license, so call them in the unit of work that adds the row: if another request takes the
+/// last place in between, that save fails with a concurrency conflict.
 /// </summary>
 public interface ILicenseService
 {

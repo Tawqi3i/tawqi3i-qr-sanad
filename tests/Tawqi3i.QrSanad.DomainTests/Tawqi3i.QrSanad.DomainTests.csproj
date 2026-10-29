@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="NUnit" />
     <PackageReference Include="NUnit3TestAdapter" />
@@ -13,7 +14,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Core\Tawqi3i.QrSanad.Domain\Tawqi3i.QrSanad.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Infrastructure\Tawqi3i.QrSanad.Identity\Tawqi3i.QrSanad.Identity.csproj" />
     <ProjectReference Include="..\..\src\Infrastructure\Tawqi3i.QrSanad.Licensing\Tawqi3i.QrSanad.Licensing.csproj" />
+    <ProjectReference Include="..\..\src\Infrastructure\Tawqi3i.QrSanad.Persistence\Tawqi3i.QrSanad.Persistence.csproj" />
     <ProjectReference Include="..\..\src\Infrastructure\Tawqi3i.QrSanad.Sanad\Tawqi3i.QrSanad.Sanad.csproj" />
   </ItemGroup>
 

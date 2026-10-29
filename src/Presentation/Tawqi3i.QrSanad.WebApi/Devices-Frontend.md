@@ -33,6 +33,7 @@ Same response shapes as `/users` (`UserViewModel` / `UserDetailsViewModel`). For
 | 400 | `The branch is disabled` |
 | 404 | `Device not found`, `Branch not found` |
 | 409 | `Username is already in use` |
+| 409 | `The record was changed by another request. Reload it and try again` (two adds took the last license place at once; retrying shows the limit) |
 | 403 | `The license device limit has been reached`, `The license has expired. Contact your provider to renew it` |
 
 ## Changes to existing screens

@@ -121,6 +121,13 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.MySql
                         .HasColumnType("char(36)")
                         .HasColumnName("id");
 
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("concurrency_stamp");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");

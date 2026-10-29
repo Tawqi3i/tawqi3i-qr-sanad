@@ -16,5 +16,6 @@ internal sealed class LicenseConfiguration : IEntityTypeConfiguration<License>
         builder.Property(a => a.Id).ValueGeneratedNever();
 
         builder.Property(a => a.Key).HasMaxLength(LicenseRequest.MaxKeyLength).IsRequired();
+        builder.Property(a => a.ConcurrencyStamp).HasMaxLength(64).IsRequired().IsConcurrencyToken();
     }
 }

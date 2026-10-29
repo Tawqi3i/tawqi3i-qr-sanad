@@ -124,6 +124,13 @@ namespace Tawqi3i.QrSanad.Persistence.Migrations.PostgreSql
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("concurrency_stamp");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");

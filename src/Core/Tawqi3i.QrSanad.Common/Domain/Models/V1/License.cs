@@ -9,4 +9,10 @@ public class License : AuditableEntity
     public static readonly Guid SingletonId = new("2f8e6c1a-9b3d-4e5f-8a7c-1d2b3c4e5f60");
 
     public string Key { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Rotated whenever a user, device or branch is added under a limit, so that two concurrent
+    /// adds cannot both take the last place (see ILicenseRepository.StageLimitClaim).
+    /// </summary>
+    public string ConcurrencyStamp { get; set; } = string.Empty;
 }

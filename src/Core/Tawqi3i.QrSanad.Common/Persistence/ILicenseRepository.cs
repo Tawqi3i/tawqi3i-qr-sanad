@@ -10,4 +10,12 @@ public interface ILicenseRepository : IRepository<License>, IUnitOnlyRepository<
     /// Stages the key as the installed license; IUnitOfWork.SaveChanges persists it.
     /// </summary>
     Task StageKey(string key, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Stages a new concurrency stamp on the license row. A limit is checked by counting and then
+    /// adding, so two requests at once can both see room for the last place; saving the new stamp
+    /// with the added row makes the second save fail with a concurrency conflict instead. Call it
+    /// before counting.
+    /// </summary>
+    Task StageLimitClaim(CancellationToken cancellationToken = default);
 }

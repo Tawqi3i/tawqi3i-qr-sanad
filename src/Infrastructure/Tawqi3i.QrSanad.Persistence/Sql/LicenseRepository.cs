@@ -2,6 +2,7 @@ namespace Tawqi3i.QrSanad.Persistence.Sql;
 
 using Microsoft.EntityFrameworkCore;
 using Tawqi3i.QrSanad.Common.Domain.Models.V1;
+using Tawqi3i.QrSanad.Common.Helpers;
 using Tawqi3i.QrSanad.Common.Persistence;
 
 internal sealed class LicenseRepository : RepositoryBase<License>, ILicenseRepository
@@ -25,11 +26,21 @@ internal sealed class LicenseRepository : RepositoryBase<License>, ILicenseRepos
 
         if (entity == null)
         {
-            this.AddOnly(new License { Id = License.SingletonId, Key = key });
+            this.AddOnly(new License { Id = License.SingletonId, Key = key, ConcurrencyStamp = Generator.NewStamp() });
         }
         else
         {
             entity.Key = key;
+        }
+    }
+
+    public async Task StageLimitClaim(CancellationToken cancellationToken = default)
+    {
+        var entity = await this.GetTrackedQueryable().FirstOrDefaultAsync(a => a.Id == License.SingletonId, cancellationToken);
+
+        if (entity != null)
+        {
+            entity.ConcurrencyStamp = Generator.NewStamp();
         }
     }
 }

@@ -127,9 +127,14 @@ internal sealed class LicenseService : ILicenseService
             return denied;
         }
 
-        return limit(license!) is { } max && await count(cancellationToken) >= max
-            ? Response.Forbidden(limitReachedMessage)
-            : null;
+        if (limit(license!) is not { } max)
+        {
+            return null;
+        }
+
+        await this.licenseRepository.StageLimitClaim(cancellationToken);
+
+        return await count(cancellationToken) >= max ? Response.Forbidden(limitReachedMessage) : null;
     }
 
     private Task<int> CountUsers(CancellationToken cancellationToken) =>
